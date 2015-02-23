@@ -1,0 +1,30 @@
+deusExMachina
+num numero = 12~
+num pru_eba12_de = 100~
+sym tucara = 'a' ~
+dec decimal = 12.00 ~
+bin flag  = true ~
+rep numero = 0 ~ 
+/rep
+set tucara
+	opt 1->
+		dec deci1 = 33.2~
+		deci1 + 1~
+	/opt 
+/set
+
+nil act funcion 
+	sym algo = 'a' ~
+	con(booleano > algo)
+		bin algo = 1 ~
+	/con
+	ret nil ~
+/act
+#*
+	this is a comment
+	con(booleano algo)
+		bin algo = 1 ~
+	/con
+*#
+
+/deusExMachina
