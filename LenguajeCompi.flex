@@ -1,3 +1,4 @@
+
 %%
 %class LenguajeCompi
 %unicode
@@ -14,13 +15,15 @@ float = {digit}(\.[0.-9]{1,2})?
 whitespace = [\s|\t\|\r|\n]+
 
 //Types and Assignment
-id = [a-zA-Z|_]+({digit}([a-zA-Z|_]+)?)*
+id = [a-zA-Z|_|@|#]+({digit}([a-zA-Z|_|@|#]+)?)*
 assign = (=)
 number = num
 binary = bin
 decimal = dec
 symbol = sym
-terminal = \~
+cadena = str
+
+terminal = \;
 
 //Flow Operators
 repetition = rep
@@ -36,21 +39,25 @@ set = set
 setEnd = \/set
 option = opt
 optionEnd = \/opt
-then = \->
 any = any
-//Option any is the "default"
+
+then = \>>
+
 
 til = til
 tilEnd = \/til
 //for the while cycle?
 
 //Functions Main
-deusexmachina = deusExMachina
-deusexmachinaEnd = \/deusExMachina
+main = run
+mainEnd = \/run
 act = act
 actEnd = \/act
 return = ret
 void = nil
+
+deusexmachina = deusExMachina
+deusexmachinaEnd = \/deusExMachina
 
 //Math Operators
 plus = \+
@@ -79,6 +86,7 @@ parIzq = \(
 parDer = \)
 braketIzq = \[
 braketDer = \]
+include = inc
 
 
 %state COMMENTS
@@ -87,76 +95,76 @@ braketDer = \]
 
 <YYINITIAL>
 {
-	{number} 			{System.out.print("INTEGER ");}
-	{binary} 			{System.out.print("BOOLEAN ");}
-	{decimal} 			{System.out.print("FLOAT ");}
-	{symbol} 			{System.out.print("CHARACTER ");}
-	{assign}			{System.out.print("ASSIGN ");}
-	{terminal} 			{System.out.println("END OF STATEMENT");}
+	{number} 			{return new Symbol(Sym.NUM);}
+	{binary} 			{return new Symbol(Sym.BIN);}
+	{decimal} 			{return new Symbol(Sym.DEC);}
+	{symbol} 			{return new Symbol(Sym.SYM);}
+	{cadena}			{return new Symbol(Sym.STR);}
+	{assign}			{return new Symbol(Sym.ASSIGN);}
+	{terminal} 			{return new Symbol(Sym.END);}
 
-	{repetition} 		{System.out.print("FOR ");}
-	{repetitionEnd} 	{System.out.println("END OF FOR");}
-	{out} 				{System.out.print("BREAK ");}
+	{repetition} 		{return new Symbol(Sym.REP);}
+	{repetitionEnd} 	{return new Symbol(Sym.REPEND);}
+	{out} 				{return new Symbol(Sym.OUT);}
 
-	{condition} 		{System.out.print("IF ");}
-	{conditionEnd} 		{System.out.println("END OF IF");}
-	{yet} 				{System.out.print("ELSE ");}
-	{yetEnd} 			{System.out.print("END OF ELSE ");}
+	{condition} 		{return new Symbol(Sym.COND);}
+	{conditionEnd} 		{return new Symbol(Sym.CONDEND);}
+	{yet} 				{return new Symbol(Sym.YET);}
+	{yetEnd} 			{return new Symbol(Sym.YETEND);}
 	
-	{set} 				{System.out.print("SWITCH ");}
-	{setEnd} 			{System.out.println("END OF SWITCH");}
-	{option} 			{System.out.print("CASE ");}
-	{optionEnd} 		{System.out.println("END OF CASE");}
-	{then}				{System.out.print("THEN ");}
-	{any}				{System.out.print("DEFAULT ");}
+	{set} 				{return new Symbol(Sym.SET);}
+	{setEnd} 			{return new Symbol(Sym.SETEND);}
+	{option} 			{return new Symbol(Sym.OPT);}
+	{optionEnd} 		{return new Symbol(Sym.OPTEND);}
+	{then}				{return new Symbol(Sym.THEN);}
+	{any}				{return new Symbol(Sym.ANY);}
 
-	{til}				{System.out.print("WHILE ");}
-	{tilEnd}			{System.out.print("WHILE END ");}
+	{til}				{return new Symbol(Sym.TIL);}
+	{tilEnd}			{return new Symbol(Sym.TILEND);}
 	
-	{deusexmachina} 	{System.out.println("MAIN FUNCTION ");}
-	{deusexmachinaEnd} 	{System.out.println("END OF MAIN FUNCTION");}
-	{act} 				{System.out.print("FUNCTION ");}
-	{actEnd} 			{System.out.println("END OF FUNCTION");}
-	{return} 			{System.out.print("RETURN ");}
-	{void} 				{System.out.print("VOID ");}
+	{main} 				{return new Symbol(Sym.MAIN);}
+	{mainEnd}		 	{return new Symbol(Sym.MAINEND);}
+	{act} 				{return new Symbol(Sym.ACT);}
+	{actEnd} 			{return new Symbol(Sym.ACTEND);}
+	{return} 			{return new Symbol(Sym.RET);}
+	{void} 				{return new Symbol(Sym.NIL);}
 
-	{plus}				{System.out.print("+ ");}
-	{minus}				{System.out.print("- ");}
-	{mult}				{System.out.print("* ");}
-	{div}				{System.out.print("/ ");}
-	{mod}				{System.out.print("% ");}
+	{plus}				{return new Symbol(Sym.PLUS);}
+	{minus}				{return new Symbol(Sym.MINUS);}
+	{mult}				{return new Symbol(Sym.MULT);}
+	{div}				{return new Symbol(Sym.DIV);}
+	{mod}				{return new Symbol(Sym.MOD);}
 
-	{and}				{System.out.print("AND ");}
-	{or}				{System.out.print("OR ");}
-	{lessThan}			{System.out.print("< ");}
-	{greaterThan}		{System.out.print("> ");}
-	{lessEqualThan}		{System.out.print("<= ");}
-	{greaterEqualThan}	{System.out.print(">= ");}
-	{equal}				{System.out.print("== ");}
-	{unEqual}			{System.out.print("!= ");}
-	{not}				{System.out.print("NOT ");}
+	{and}				{return new Symbol(Sym.AND);}
+	{or}				{return new Symbol(Sym.OR);}
+	{lessThan}			{return new Symbol(Sym.LESSTHAN);}
+	{greaterThan}		{return new Symbol(Sym.GREATERTHAN);}
+	{lessEqualThan}		{return new Symbol(Sym.LESSEQUALTHAN);}
+	{greaterEqualThan}	{return new Symbol(Sym.GREATEREQUALTHAN);}
+	{equal}				{return new Symbol(Sym.EQUAL);}
+	{unEqual}			{return new Symbol(Sym.NOTEQUAL);}
+	{not}				{return new Symbol(Sym.NOT);}
+
+	{dot}				{return new Symbol(Sym.DOT);}
+	{comma}				{return new Symbol(Sym.COMMA);}
+	{parIzq}			{return new Symbol(Sym.PARIZQ);}
+	{parDer}			{return new Symbol(Sym.PARDER);}
+	{braketIzq}			{return new Symbol(Sym.BRAIZQ);}
+	{braketDer}			{return new Symbol(Sym.BRADER);}
+	{commentStart}		{yybegin(COMMENTS);}
+	{include}			{return new Symbol(Sym.INCLUDE);}
+
+	{digit}				{return new Symbol(Sym.DIGIT, yytext());}
+	{boolean}			{return new Symbol(Sym.BOOL);}
+	{string}			{return new Symbol(Sym.STRING, yytext());}
+	{character}			{return new Symbol(Sym.CHAR, yytext());}
+	{float}				{return new Symbol(Sym.FLOAT, yytext());}
 	
-
-	{dot}				{System.out.print(" . ");}
-	{comma}				{System.out.print(" , ");}
-	{parIzq}			{System.out.print(" ( ");}
-	{parDer}			{System.out.print(" ) ");}
-	{braketIzq}			{System.out.print(" [ ");}
-	{braketDer}			{System.out.print(" ] ");}
-	{commentStart}		{System.out.println(" COMMENT BLOCK"); yybegin(COMMENTS);}
-
-	{digit}				{System.out.print("Number("+ yytext() +") ");}
-	{boolean}			{System.out.print("Boolean("+ yytext() +") ");}
-	{string}			{System.out.print("String("+ yytext() +") ");}
-	{character}			{System.out.print("Character("+ yytext() +") ");}
-	{float}				{System.out.print("Float(" +yytext() +") ");}
-	
-	{id}				{System.out.print("IDENTIFIER("+ yytext() +") ");}
+	{id}				{return new Symbol(Sym.ID, yytext());}
 
 	{whitespace}		{}
-	. 					{System.err.println("Unknown Token: "+yytext()+" Line "+Integer.toString(yyline)+" Column "+Integer.toString(yycolumn));}
+	. 					{return new Symbol(Sym.ERROR, "Unknown Token: "+yytext()+" Line "+Integer.toString(yyline)+" Column "+Integer.toString(yycolumn) );}
 } 
 <COMMENTS>{
-	{commentEnd}	{System.out.println("COMMENT BLOCK END"); yybegin(YYINITIAL);}
-	.|{whitespace}		{System.out.print(yytext());}
+	{commentEnd}|.|{whitespace}		{}
 }
