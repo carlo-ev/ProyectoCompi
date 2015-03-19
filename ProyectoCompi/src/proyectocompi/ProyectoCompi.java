@@ -15,7 +15,11 @@ public class ProyectoCompi {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        Editor gui = new Editor();
+        gui.setVisible(true);
+        FileManager codeFile = new FileManager("", gui.getEditorPane(), gui.getStatusBar(), gui.getDocumentBar());
+        gui.setFileManager(codeFile);
+        
     }
     
 }
