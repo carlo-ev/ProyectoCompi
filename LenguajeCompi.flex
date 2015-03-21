@@ -190,22 +190,23 @@ include = inc
 
 	*/
 	
-	{id}				{return new symbol(Sym.ID, yytext());}
-	{number} 			{return new symbol(Sym.NUM);}
-	{binary} 			{return new Symbol(Sym.BIN);}
-	{decimal} 			{return new Symbol(Sym.DEC);}
-	{symbol} 			{return new Symbol(Sym.SYM);}
-	{cadena}			{return new Symbol(Sym.STR);}
+	
+	{number} 			{return new symbol(sym.NUM);}
+	{binary} 			{return new Symbol(sym.BIN);}
+	{decimal} 			{return new Symbol(sym.DEC);}
+	{symbol} 			{return new Symbol(sym.SYM);}
+	{cadena}			{return new Symbol(sym.STR);}
 
-	{assign}			{return new Symbol(Sym.ASSIGN);}
-	{terminal} 			{return new Symbol(Sym.END);}
-	{digit}				{return new Symbol(Sym.DIGIT, yytext());}
+	{assign}			{return new Symbol(sym.ASSIGN);}
+	{terminal} 			{return new Symbol(sym.END);}
+	{digit}				{return new Symbol(sym.DIGIT, yytext());}
 
-	{plus}				{return new Symbol(Sym.PLUS);}
-	{minus}				{return new Symbol(Sym.MINUS);}
-	{mult}				{return new Symbol(Sym.MULT);}
-	{div}				{return new Symbol(Sym.DIV);}
-	{mod}				{return new Symbol(Sym.MOD);}
+	{plus}				{return new Symbol(sym.PLUS);}
+	{minus}				{return new Symbol(sym.MINUS);}
+	{mult}				{return new Symbol(sym.MULT);}
+	{div}				{return new Symbol(sym.DIV);}
+	{mod}				{return new Symbol(sym.MOD);}
+	{id}				{return new symbol(sym.ID, yytext());}
 	{whitespace}		{}
 	. 					{this.printOutput("Unknown Token: "+yytext()+" in Line "+Integer.toString(yyline)+" Column "+Integer.toString(yycolumn) );}
 
