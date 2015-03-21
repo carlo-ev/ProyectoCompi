@@ -182,11 +182,11 @@ include = inc
 	{commentStart}		{yybegin(COMMENTS);}
 	{include}			{return new Symbol(Sym.INCLUDE);}
 
-	{digit}				{return new Symbol(Sym.DIGIT, yytext());}
-	{boolean}			{return new Symbol(Sym.BOOL);}
-	{string}			{return new Symbol(Sym.STRING, yytext());}
-	{character}			{return new Symbol(Sym.CHAR, yytext());}
-	{float}				{return new Symbol(Sym.FLOAT, yytext());}
+	{digit}				{return new Symbol(Sym.DIGIT, new Integer(yytext()));}
+	{boolean}			{return new Symbol(Sym.BOOL new Boolean(yytext()));}
+	{string}			{return new Symbol(Sym.STRING, new String(yytext()));}
+	{character}			{return new Symbol(Sym.CHAR, new Char(yytext()));}
+	{float}				{return new Symbol(Sym.FLOAT, new Float(yytext().substring(0,yylength())));}
 
 	*/
 	

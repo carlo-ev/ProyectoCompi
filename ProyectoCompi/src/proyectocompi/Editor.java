@@ -299,7 +299,7 @@ public class Editor extends javax.swing.JFrame {
         try{
             lexer = new LenguajeCompi(this.currentFileManager.getCurrentFile());
             lexer.setOutputArea(this.outputPane);
-            lexer.yylex();
+            //lexer.yylex();
             System.out.println(lexer.getLexErrors());
         }catch(Exception ex){
             System.out.println("done creating lexer");
