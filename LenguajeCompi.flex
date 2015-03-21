@@ -1,10 +1,16 @@
 
+package ProyectoCompi;
+
+import java.util.ArrayList;
+import javax.swing.JTextArea;
+import java_cup.runtime.Symbol;
 %%
 %class LenguajeCompi
 %unicode
 %line
 %column
 %int
+%cup
 
 //Values
 digit = [0-9]+
@@ -88,13 +94,33 @@ braketIzq = \[
 braketDer = \]
 include = inc
 
-
 %state COMMENTS
+
+%{
+	public JTextArea outputArea;
+	public ArrayList<String> lexErrors = new ArrayList<String>();
+
+	public void setOutputArea(JTextArea output){
+		this.outputArea = output;
+	}
+
+	public void printOutput(String outputLine){
+		if(this.outputArea != null){
+			this.outputArea.append(outputLine + "\n");
+		} 
+		this.lexErrors.add(outputLine);
+	}
+
+	public ArrayList getLexErrors(){
+		return this.lexErrors;
+	}
+%}
 
 %%
 
 <YYINITIAL>
 {
+/*
 	{number} 			{return new Symbol(Sym.NUM);}
 	{binary} 			{return new Symbol(Sym.BIN);}
 	{decimal} 			{return new Symbol(Sym.DEC);}
@@ -121,10 +147,10 @@ include = inc
 
 	{til}				{return new Symbol(Sym.TIL);}
 	{tilEnd}			{return new Symbol(Sym.TILEND);}
-	
-	{main} 				{return new Symbol(Sym.MAIN);}
-	{mainEnd}		 	{return new Symbol(Sym.MAINEND);}
-	{act} 				{return new Symbol(Sym.ACT);}
+*/	
+	{main} 				{return new Symbol(sym.MAIN);}
+	{mainEnd}		 	{return new Symbol(sym.MAINEND);}
+/*	{act} 				{return new Symbol(Sym.ACT);}
 	{actEnd} 			{return new Symbol(Sym.ACTEND);}
 	{return} 			{return new Symbol(Sym.RET);}
 	{void} 				{return new Symbol(Sym.NIL);}
@@ -161,9 +187,9 @@ include = inc
 	{float}				{return new Symbol(Sym.FLOAT, yytext());}
 	
 	{id}				{return new Symbol(Sym.ID, yytext());}
-
+*/
 	{whitespace}		{}
-	. 					{return new Symbol(Sym.ERROR, "Unknown Token: "+yytext()+" Line "+Integer.toString(yyline)+" Column "+Integer.toString(yycolumn) );}
+	. 					{printOutput("Unknown Token: "+yytext()+" in Line "+Integer.toString(yyline)+" Column "+Integer.toString(yycolumn) );}
 } 
 <COMMENTS>{
 	{commentEnd}|.|{whitespace}		{}

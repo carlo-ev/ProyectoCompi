@@ -113,6 +113,17 @@ public class FileManager {
         }
         return filePath;
     }
+    public FileReader getCurrentFile(){
+        FileReader f;
+        try{
+            setStatus("Retrieving File...");
+            f = new FileReader(getFilePath());
+        }catch(Exception ex){
+            setStatus("Unable to Read Current File!");
+            f = null;
+        }
+        return f;
+    }
     public void setFilePath(String path){
         filePath = path;
         if(documentOutput != null)

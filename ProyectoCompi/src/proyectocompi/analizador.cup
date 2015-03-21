@@ -1,0 +1,39 @@
+package ProyectoCompi;
+
+import java_cup.runtime.*;
+import java.io.FileInputStream;
+import java.io.InputStream;
+
+//TERMINALES
+/*
+// Tipos
+terminal NUM, BIN, DEC, SYM, STR;
+// Valores
+terminal DIGIT, BOOL, CHAR, STRING, FLOAT;
+// Statements
+terminal ID, ASSIGN, END;
+// Ciclo FOR
+terminal REP, REPEND, OUT;
+// IF
+terminal COND, CONDEND, YET, YETEND;
+// SWITCH 
+terminal SET, SETEND, OPT, OPTEND, THEN, ANY;
+// WHILE
+terminal TIL, TILEND;
+// Main & Funciones
+*/
+terminal MAIN, MAINEND;//, ACT, ACTEND, RET, NIL;
+/*
+// Operadores 
+terminal PLUS, MINUS, MULT, DIV, MOD, DOT;
+// Operadores Logicos
+terminal AND, OR, LESSTHAN, GREATERTHAN, GREATEREQUALTHAN, LESSTHEN, LESSEQUALTHAN, EQUAL, NOTEQUAL, NOT;
+// Fillers
+terminal COMMA, PARIZQ, PARDER, BRAIZQ, BRADER, INCLUDE;
+*/
+//NO TEMRINALES
+non terminal test;
+
+start with test;
+
+test ::= MAIN MAINEND;

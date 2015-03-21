@@ -293,6 +293,13 @@ public class Editor extends javax.swing.JFrame {
 
     private void barCheckButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_barCheckButtonActionPerformed
         // Cup code here!
+        LenguajeCompi lexer;
+        try{
+            lexer = new LenguajeCompi(this.currentFileManager.getCurrentFile());
+            lexer.yylex();
+        }catch(Exception ex){
+            System.out.println("done creating lexer");
+        }
     }//GEN-LAST:event_barCheckButtonActionPerformed
 
     private void barExitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_barExitButtonActionPerformed
