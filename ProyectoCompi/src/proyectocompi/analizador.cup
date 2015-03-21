@@ -1,4 +1,4 @@
-package ProyectoCompi;
+package proyectocompi;
 
 import java_cup.runtime.*;
 import java.io.FileInputStream;
@@ -23,6 +23,9 @@ terminal TIL, TILEND;
 // Main & Funciones
 */
 terminal MAIN, MAINEND;//, ACT, ACTEND, RET, NIL;
+terminal NUM, BIN, DEC, SYM, STR;
+terminal ID, ASSIGN, END;
+terminal DIGIT, BOOL, CHAR, STRING, FLOAT;
 /*
 // Operadores 
 terminal PLUS, MINUS, MULT, DIV, MOD, DOT;
@@ -33,6 +36,9 @@ terminal COMMA, PARIZQ, PARDER, BRAIZQ, BRADER, INCLUDE;
 */
 //NO TEMRINALES
 non terminal test;
+non terminal stat, tipo, stat2, arit, E, T, F;
+
+
 
 start with test;
 

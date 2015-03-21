@@ -122,6 +122,9 @@ public class FileManager {
             setStatus("Unable to Read Current File!");
             f = null;
         }
+        if (f != null) {
+            setStatus("Done");
+        }
         return f;
     }
     public void setFilePath(String path){

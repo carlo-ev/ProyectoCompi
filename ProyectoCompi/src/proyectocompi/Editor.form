@@ -199,6 +199,7 @@
               <Color blue="0" green="ff" id="green" palette="1" red="0" type="palette"/>
             </Property>
             <Property name="rows" type="int" value="5"/>
+            <Property name="text" type="java.lang.String" value="Hola"/>
           </Properties>
         </Component>
       </SubComponents>

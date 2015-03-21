@@ -165,6 +165,7 @@ public class Editor extends javax.swing.JFrame {
         outputPane.setColumns(20);
         outputPane.setForeground(java.awt.Color.green);
         outputPane.setRows(5);
+        outputPane.setText("Hola");
         outputScroll.setViewportView(outputPane);
 
         outputLabel.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
@@ -293,10 +294,13 @@ public class Editor extends javax.swing.JFrame {
 
     private void barCheckButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_barCheckButtonActionPerformed
         // Cup code here!
+        this.currentFileManager.writeContent();
         LenguajeCompi lexer;
         try{
             lexer = new LenguajeCompi(this.currentFileManager.getCurrentFile());
+            lexer.setOutputArea(this.outputPane);
             lexer.yylex();
+            System.out.println(lexer.getLexErrors());
         }catch(Exception ex){
             System.out.println("done creating lexer");
         }

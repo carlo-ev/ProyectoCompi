@@ -1,9 +1,9 @@
 
-package ProyectoCompi;
+package proyectocompi;
 
 import java.util.ArrayList;
 import javax.swing.JTextArea;
-import java_cup.runtime.Symbol;
+import java_cup.runtime.*;
 %%
 %class LenguajeCompi
 %unicode
@@ -120,8 +120,10 @@ include = inc
 
 <YYINITIAL>
 {
+
+	
 /*
-	{number} 			{return new Symbol(Sym.NUM);}
+	{number} 			{return new symbol(Sym.NUM);}
 	{binary} 			{return new Symbol(Sym.BIN);}
 	{decimal} 			{return new Symbol(Sym.DEC);}
 	{symbol} 			{return new Symbol(Sym.SYM);}
@@ -185,11 +187,29 @@ include = inc
 	{string}			{return new Symbol(Sym.STRING, yytext());}
 	{character}			{return new Symbol(Sym.CHAR, yytext());}
 	{float}				{return new Symbol(Sym.FLOAT, yytext());}
+
+	*/
 	
-	{id}				{return new Symbol(Sym.ID, yytext());}
-*/
+	{id}				{return new symbol(Sym.ID, yytext());}
+	{number} 			{return new symbol(Sym.NUM);}
+	{binary} 			{return new Symbol(Sym.BIN);}
+	{decimal} 			{return new Symbol(Sym.DEC);}
+	{symbol} 			{return new Symbol(Sym.SYM);}
+	{cadena}			{return new Symbol(Sym.STR);}
+
+	{assign}			{return new Symbol(Sym.ASSIGN);}
+	{terminal} 			{return new Symbol(Sym.END);}
+	{digit}				{return new Symbol(Sym.DIGIT, yytext());}
+
+	{plus}				{return new Symbol(Sym.PLUS);}
+	{minus}				{return new Symbol(Sym.MINUS);}
+	{mult}				{return new Symbol(Sym.MULT);}
+	{div}				{return new Symbol(Sym.DIV);}
+	{mod}				{return new Symbol(Sym.MOD);}
 	{whitespace}		{}
-	. 					{printOutput("Unknown Token: "+yytext()+" in Line "+Integer.toString(yyline)+" Column "+Integer.toString(yycolumn) );}
+	. 					{this.printOutput("Unknown Token: "+yytext()+" in Line "+Integer.toString(yyline)+" Column "+Integer.toString(yycolumn) );}
+
+
 } 
 <COMMENTS>{
 	{commentEnd}|.|{whitespace}		{}
