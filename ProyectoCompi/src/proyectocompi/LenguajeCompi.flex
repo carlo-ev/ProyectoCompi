@@ -131,27 +131,28 @@ include = inc
 	{assign}			{return new Symbol(Sym.ASSIGN);}
 	{terminal} 			{return new Symbol(Sym.END);}
 
-	{repetition} 		{return new Symbol(Sym.REP);}
-	{repetitionEnd} 	{return new Symbol(Sym.REPEND);}
+	{repetition}                    {return new Symbol(Sym.REP);}
+	{repetitionEnd}                 {return new Symbol(Sym.REPEND);}
 	{out} 				{return new Symbol(Sym.OUT);}
 
-	{condition} 		{return new Symbol(Sym.COND);}
-	{conditionEnd} 		{return new Symbol(Sym.CONDEND);}
+	{condition}                     {return new Symbol(Sym.COND);}
+	{conditionEnd}                  {return new Symbol(Sym.CONDEND);}
 	{yet} 				{return new Symbol(Sym.YET);}
 	{yetEnd} 			{return new Symbol(Sym.YETEND);}
 	
 	{set} 				{return new Symbol(Sym.SET);}
 	{setEnd} 			{return new Symbol(Sym.SETEND);}
 	{option} 			{return new Symbol(Sym.OPT);}
-	{optionEnd} 		{return new Symbol(Sym.OPTEND);}
+	{optionEnd}                     {return new Symbol(Sym.OPTEND);}
 	{then}				{return new Symbol(Sym.THEN);}
 	{any}				{return new Symbol(Sym.ANY);}
 
 	{til}				{return new Symbol(Sym.TIL);}
 	{tilEnd}			{return new Symbol(Sym.TILEND);}
-*/	
+	
 	{main} 				{return new Symbol(sym.MAIN);}
 	{mainEnd}		 	{return new Symbol(sym.MAINEND);}
+*/
 /*	{act} 				{return new Symbol(Sym.ACT);}
 	{actEnd} 			{return new Symbol(Sym.ACTEND);}
 	{return} 			{return new Symbol(Sym.RET);}
@@ -166,9 +167,9 @@ include = inc
 	{and}				{return new Symbol(Sym.AND);}
 	{or}				{return new Symbol(Sym.OR);}
 	{lessThan}			{return new Symbol(Sym.LESSTHAN);}
-	{greaterThan}		{return new Symbol(Sym.GREATERTHAN);}
-	{lessEqualThan}		{return new Symbol(Sym.LESSEQUALTHAN);}
-	{greaterEqualThan}	{return new Symbol(Sym.GREATEREQUALTHAN);}
+	{greaterThan}                   {return new Symbol(Sym.GREATERTHAN);}
+	{lessEqualThan}                 {return new Symbol(Sym.LESSEQUALTHAN);}
+	{greaterEqualThan}              {return new Symbol(Sym.GREATEREQUALTHAN);}
 	{equal}				{return new Symbol(Sym.EQUAL);}
 	{unEqual}			{return new Symbol(Sym.NOTEQUAL);}
 	{not}				{return new Symbol(Sym.NOT);}
@@ -179,7 +180,7 @@ include = inc
 	{parDer}			{return new Symbol(Sym.PARDER);}
 	{braketIzq}			{return new Symbol(Sym.BRAIZQ);}
 	{braketDer}			{return new Symbol(Sym.BRADER);}
-	{commentStart}		{yybegin(COMMENTS);}
+	{commentStart}                  {yybegin(COMMENTS);}
 	{include}			{return new Symbol(Sym.INCLUDE);}
 
 	{digit}				{return new Symbol(Sym.DIGIT, yytext());}
@@ -191,10 +192,10 @@ include = inc
 	*/
 	
 	
-	{number} 			{return new symbol(sym.NUM);}
-	{binary} 			{return new Symbol(sym.BIN);}
+	{number} 			{return new Symbol(sym.NUM);}
+	//{binary} 			{return new Symbol(sym.BIN);}
 	{decimal} 			{return new Symbol(sym.DEC);}
-	{symbol} 			{return new Symbol(sym.SYM);}
+	//{symbol} 			{return new Symbol(sym.SYM);}
 	{cadena}			{return new Symbol(sym.STR);}
 
 	{assign}			{return new Symbol(sym.ASSIGN);}
@@ -206,7 +207,7 @@ include = inc
 	{mult}				{return new Symbol(sym.MULT);}
 	{div}				{return new Symbol(sym.DIV);}
 	{mod}				{return new Symbol(sym.MOD);}
-	{id}				{return new symbol(sym.ID, yytext());}
+	{id}				{return new Symbol(sym.ID, yytext());}
 	{whitespace}		{}
 	. 					{this.printOutput("Unknown Token: "+yytext()+" in Line "+Integer.toString(yyline)+" Column "+Integer.toString(yycolumn) );}
 
