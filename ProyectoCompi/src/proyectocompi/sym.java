@@ -8,25 +8,37 @@ package proyectocompi;
 /** CUP generated class containing symbol constants. */
 public class sym {
   /* terminals */
-  public static final int MOD = 16;
-  public static final int PLUS = 12;
+  public static final int MOD = 19;
+  public static final int AND = 22;
+  public static final int PLUS = 15;
+  public static final int OR = 23;
+  public static final int EQUAL = 28;
   public static final int DIGIT = 3;
+  public static final int NOTEQUAL = 29;
   public static final int CHAR = 5;
-  public static final int PARIZQ = 17;
-  public static final int END = 11;
-  public static final int PARDER = 18;
+  public static final int NOT = 30;
+  public static final int PARIZQ = 20;
+  public static final int END = 14;
+  public static final int GREATEREQUALTHAN = 27;
+  public static final int PARDER = 21;
   public static final int ID = 7;
   public static final int NUM = 8;
+  public static final int STRING = 6;
   public static final int FLOAT = 4;
+  public static final int LESSTHAN = 24;
+  public static final int MULT = 17;
+  public static final int SYM = 12;
   public static final int EOF = 0;
-  public static final int MULT = 14;
-  public static final int DIV = 15;
+  public static final int DIV = 18;
   public static final int DEC = 9;
-  public static final int MINUS = 13;
+  public static final int BIN = 11;
+  public static final int MINUS = 16;
   public static final int error = 1;
-  public static final int ASSIGN = 10;
-  public static final int STR = 6;
+  public static final int LESSEQUALTHAN = 26;
+  public static final int ASSIGN = 13;
+  public static final int STR = 10;
   public static final int BOOL = 2;
+  public static final int GREATERTHAN = 25;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
@@ -34,10 +46,13 @@ public class sym {
   "DIGIT",
   "FLOAT",
   "CHAR",
-  "STR",
+  "STRING",
   "ID",
   "NUM",
   "DEC",
+  "STR",
+  "BIN",
+  "SYM",
   "ASSIGN",
   "END",
   "PLUS",
@@ -46,7 +61,16 @@ public class sym {
   "DIV",
   "MOD",
   "PARIZQ",
-  "PARDER"
+  "PARDER",
+  "AND",
+  "OR",
+  "LESSTHAN",
+  "GREATERTHAN",
+  "LESSEQUALTHAN",
+  "GREATEREQUALTHAN",
+  "EQUAL",
+  "NOTEQUAL",
+  "NOT"
   };
 }
 

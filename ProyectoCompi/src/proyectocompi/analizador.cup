@@ -1,36 +1,57 @@
 package proyectocompi;
 
 import java_cup.runtime.*;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
+
 
 //NO Terminales
+
+// Non Terminals Random
 non terminal Test;
-non terminal Stat, Tipo, Stat2, ArithType, Arit, E, T, F;
+non terminal Stat, Tipo, Stat1, Types, Literals, Arit, E, T, F;
+
+// Non Terminals Logical Statements
+non terminal LogicalOperators, Concat, Negation, Logical, LogicalA, LogicalB, LogicalC;
 
 terminal java.lang.Boolean BOOL;
 terminal java.lang.Number DIGIT;
 terminal java.lang.Number FLOAT;
 terminal java.lang.Character CHAR;
-terminal java.lang.String STR;
+terminal java.lang.String STRING;
 terminal java.lang.String ID;
-terminal NUM, DEC;
 
+// Variable types
+terminal NUM, DEC, STR, BIN, SYM;
+
+// Arithmetic Operators
 terminal ASSIGN, END;
 terminal PLUS, MINUS, MULT, DIV, MOD;
 terminal PARIZQ, PARDER;
 
+// Logical Operators
+terminal AND, OR, LESSTHAN, GREATERTHAN, LESSEQUALTHAN, GREATEREQUALTHAN, EQUAL, NOTEQUAL, NOT;
+
 start with Stat;
 
-// Arithmetic Statements
-Stat ::= ArithType Stat2;
-Stat2 ::= ID END | ID ASSIGN ID END | ID ASSIGN Arit;
+// Normal Statements
+//Stat ::= Types Stat1 | ;
+Stat ::= Logical | ;
+//Types ::= NUM | DEC | BIN | SYM | STR |;
+Literals ::= BOOL | DIGIT | FLOAT | CHAR | STRING | ID;
+//Stat1 ::= ID ASSIGN Arit;
 
-// Tipos de variable
-ArithType ::= NUM | DEC;
+// Normal Operations
+//Arit ::= E END Stat;
+//E ::= E PLUS T | E MINUS T | T;
+//T ::= T MULT F | T DIV F | T MOD F | F;
+//F ::= Literals| PARIZQ E PARDER;
 
-// Operaciones aritmeticas
-Arit ::= E END;
-E ::= E PLUS T | E MINUS T | T;
-T ::= T MULT F | T DIV F | T MOD F | F;
-F ::= DIGIT | FLOAT | PARIZQ E PARDER;
+
+//Logical Operations
+LogicalOperators ::= LESSTHAN | GREATERTHAN | LESSEQUALTHAN | GREATEREQUALTHAN | EQUAL | NOTEQUAL;
+Concat ::= AND | OR;
+Negation ::= NOT | ;
+Logical ::= LogicalA Stat;
+LogicalA ::= LogicalA Concat LogicalB | LogicalB;
+LogicalB ::= LogicalB LogicalOperators LogicalC | LogicalC;
+LogicalC ::= Negation Literals | Negation PARIZQ LogicalA PARDER;

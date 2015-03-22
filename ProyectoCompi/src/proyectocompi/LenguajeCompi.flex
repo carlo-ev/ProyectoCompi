@@ -16,7 +16,7 @@ import java_cup.runtime.*;
 digit = [0-9]+
 boolean = (true|false)
 character = '(.|\s)'
-string = "(.|\s|\t|\n)*"
+string = " \"(.|\s|\t|\n)*\" "
 float = {digit}(\.[0.-9]{1,2})?
 whitespace = [\s|\t\|\r|\n]+
 
@@ -78,7 +78,7 @@ or = or
 lessThan = <
 greaterThan = >
 lessEqualThan = <=
-greaterEqualThan = >=
+greaterEqualThan = ">="
 equal = (==)
 unEqual = (\!=)
 not = [not|!]
@@ -115,6 +115,10 @@ include = inc
 		return this.lexErrors;
 	}
 %}
+
+%eofval{
+  return new Symbol(sym.EOF);
+%eofval}
 
 %%
 
@@ -193,23 +197,37 @@ include = inc
 	
 	
 	{number} 			{return new Symbol(sym.NUM);}
-	//{binary} 			{return new Symbol(sym.BIN);}
+	{binary} 			{return new Symbol(sym.BIN);}
 	{decimal} 			{return new Symbol(sym.DEC);}
-	//{symbol} 			{return new Symbol(sym.SYM);}
+	{symbol} 			{return new Symbol(sym.SYM);}
 	{cadena}			{return new Symbol(sym.STR);}
 
 	{assign}			{return new Symbol(sym.ASSIGN);}
 	{terminal} 			{return new Symbol(sym.END);}
 	{digit}				{return new Symbol(sym.DIGIT, yytext());}
+        {float}				{return new Symbol(sym.FLOAT, yytext());}
+
+        {and}				{return new Symbol(sym.AND);}
+	{or}				{return new Symbol(sym.OR);}
+	{lessThan}			{return new Symbol(sym.LESSTHAN);}
+	{greaterThan}                   {return new Symbol(sym.GREATERTHAN);}
+	{lessEqualThan}                 {return new Symbol(sym.LESSEQUALTHAN);}
+	{greaterEqualThan}              {return new Symbol(sym.GREATEREQUALTHAN);}
+	{equal}				{return new Symbol(sym.EQUAL);}
+	{unEqual}			{return new Symbol(sym.NOTEQUAL);}
+	{not}				{return new Symbol(sym.NOT);}
 
 	{plus}				{return new Symbol(sym.PLUS);}
 	{minus}				{return new Symbol(sym.MINUS);}
 	{mult}				{return new Symbol(sym.MULT);}
 	{div}				{return new Symbol(sym.DIV);}
 	{mod}				{return new Symbol(sym.MOD);}
+        {parIzq}			{return new Symbol(sym.PARIZQ);}
+	{parDer}			{return new Symbol(sym.PARDER);}
 	{id}				{return new Symbol(sym.ID, yytext());}
+
 	{whitespace}		{}
-	. 					{this.printOutput("Unknown Token: "+yytext()+" in Line "+Integer.toString(yyline)+" Column "+Integer.toString(yycolumn) );}
+	. 				{this.printOutput("Unknown Token: "+yytext()+" in Line "+Integer.toString(yyline)+" Column "+Integer.toString(yycolumn) );}
 
 
 } 
