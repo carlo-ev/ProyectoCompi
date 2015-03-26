@@ -41,10 +41,10 @@ Literals ::= BOOL | DIGIT | FLOAT | CHAR | STRING | ID;
 //Stat1 ::= ID ASSIGN Arit;
 
 // Normal Operations
-//Arit ::= E END Stat;
-//E ::= E PLUS T | E MINUS T | T;
-//T ::= T MULT F | T DIV F | T MOD F | F;
-//F ::= Literals| PARIZQ E PARDER;
+Arit ::= E END Stat;
+E ::= E PLUS T | E MINUS T | T;
+T ::= T MULT F | T DIV F | T MOD F | F;
+F ::= Literals| PARIZQ E PARDER;
 
 
 //Logical Operations
