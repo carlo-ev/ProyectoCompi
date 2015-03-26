@@ -9,10 +9,31 @@ parser code
 {:
     
     public JTextArea outputArea;
+    public  int errors = 0;
     
-    public void report_error(String message){
-        this.outputArea.append(message);
+    public void syntax_error(Symbol sym){
+        report_error("Unexpected Token", sym.toString() );
     }
+
+    public void report_error(String message, Object info) {
+    if (info instanceof String){
+	errors++; 
+      System.err.println("  "+ errors + "==> " + info + " "+ message);
+        outputArea.append("> " + message + "\n" + " -> " + info);
+    }
+    else {
+    	StringBuffer m = new StringBuffer("Error ");
+    	if (info instanceof java_cup.runtime.Symbol) 
+     	   m.append( "("+info.toString()+")" );     
+    	m.append(" : "+message);   
+    	System.err.println(m);
+    }
+  }
+   
+  public void report_fatal_error(String message, Object info) {
+    report_error(message, info);
+    throw new RuntimeException("Fatal Syntax Error");
+  }
 
     public void setOutput(JTextArea out){
         this.outputArea = out;
@@ -68,13 +89,15 @@ terminal PARIZQ, PARDER, COMMA;//, BRAIZQ, BRADER, INCLUDE;
 //NO TEMRINALES
 non terminal PROGRAM, PROGRAM_BODY;
 
-non terminal IF_S, IF_A, FOR_S, FOR_A, WHILE_S, WHILE_A, SWITCH_S, SWITCH_A, SWITCH_B, SWITCH_C, SWITCH_TYPES;
+non terminal IF_S, IF_A, IF_B, IF_C, FOR_S, FOR_A, WHILE_S, WHILE_A, SWITCH_S, SWITCH_A, SWITCH_B, SWITCH_C, SWITCH_TYPES;
 
 
 //Sept No Terminales
-non terminal DECLARE_S, DECLARE_A, DECLARE_B, DECLARE_FOR, TYPES, LITERALS, ARIT, E, T, F;
+non terminal DECLARE_S, DECLARE_A, DECLARE_B, DECLARE_FOR,DECLARE_RECOVER, TYPES, LITERALS, ARIT, E, T, F;
 non terminal LogicalOperators, Concat, Negation, LogicalA, LogicalB;
 non terminal ELogical, TLogical, FLogical;
+
+non terminal LogicalErrorEnd, WHILE_B;
 
 start with PROGRAM;
 
@@ -82,13 +105,18 @@ TYPES ::= NUM | DEC | BIN | SYM | STR;
 LITERALS ::= BOOL | DIGIT | FLOAT | CHAR | STRING | ID;
 
 //DECLARACION
-DECLARE_B ::= ID COMMA DECLARE_B | ID;
-DECLARE_A ::= ID ASSIGN ARIT;
+DECLARE_B ::= ID COMMA DECLARE_B 
+            | ID
+            | ID COMMA error END {: parser.report_error("Declaracion no valida", "ra"); :};
+DECLARE_A ::= ID ASSIGN ARIT
+            | ID ASSIGN error END {: parser.report_error("Declaracion no valida", "ra"); :};
+DECLARE_RECOVER ::= END | PROGRAM_BODY;
 DECLARE_S ::= TYPES DECLARE_A | TYPES DECLARE_B END | DECLARE_A;
 //DECLARACION END
 
 //DECLARACION PARA EL FOR
-DECLARE_FOR ::= TYPES ID ASSIGN E | ID ASSIGN E;
+DECLARE_FOR ::= TYPES ID ASSIGN E 
+            | ID ASSIGN E;
 //CASO ESPECIAL
 
 //ARIT OPERATION
@@ -104,9 +132,17 @@ Concat ::= AND | OR;
 Negation ::= NOT | ;
 LogicalOperators ::= LESSTHAN | GREATERTHAN | LESSEQUALTHAN | GREATEREQUALTHAN | EQUAL | NOTEQUAL;
 
+
 //Logical Operations
-LogicalA ::= LogicalA Concat LogicalB | LogicalB;
-LogicalB ::= ELogical LogicalOperators LogicalB | ELogical;
+LogicalA ::= LogicalA Concat LogicalB 
+            | LogicalB
+            | LogicalA error LogicalErrorEnd {: parser.report_error("Declaracion logica no valida", "ra"); :};
+            
+LogicalB ::= ELogical LogicalOperators LogicalB 
+            | ELogical
+            | error LogicalErrorEnd {: parser.report_error("Declaracion logica no valida", "ra"); :};
+
+LogicalErrorEnd ::= PARDER | END;
 
 //Arithmetic Operations for Logical Statements.
 ELogical ::= ELogical PLUS TLogical | ELogical MINUS TLogical | TLogical;
@@ -117,18 +153,29 @@ FLogical ::= Negation LITERALS| Negation PARIZQ LogicalA PARDER;
 
 
 //IF 
-IF_A ::= YET PROGRAM_BODY YETEND | ;
-IF_S ::= COND PARIZQ LogicalA PARDER PROGRAM_BODY CONDEND IF_A;
+IF_C ::= YET PROGRAM_BODY YETEND
+        | YET error {: parser.report_error("YET sin /YET", ""); :}
+        | ;
+IF_B ::= PROGRAM_BODY CONDEND IF_C
+        | error {: parser.report_error("CON sin /CON", ""); :};
+IF_A ::= PARIZQ LogicalA PARDER IF_B
+        | PARIZQ error {: parser.report_error("Mala Condicion?", ""); :};
+IF_S ::= COND IF_A
+        | COND error {: parser.report_error("CON Syntax Error", ""); :};
 // IF END
 
 //FOR 
 FOR_A ::= PROGRAM_BODY | PROGRAM_BODY OUT END;
-FOR_S ::= REP PARIZQ DECLARE_FOR LogicalA END DECLARE_FOR PARDER FOR_A REPEND;  
+FOR_S ::= REP PARIZQ DECLARE_S LogicalA END DECLARE_S PARDER FOR_A REPEND;  
 //FOR END
 
 //WHILE
-    WHILE_A ::= PROGRAM_BODY | PROGRAM_BODY OUT END;
-    WHILE_S ::= TIL PARIZQ LogicalA PARDER WHILE_A TILEND;
+    WHILE_A ::= PROGRAM_BODY TILEND | PROGRAM_BODY OUT END TILEND
+            | error {:parser.report_error("no til end", ""); :};
+    WHILE_B ::= PARIZQ LogicalA PARDER WHILE_A
+            | PARIZQ error {: parser.report_error("wrong condition for til", ""); :};
+    WHILE_S ::= TIL WHILE_B
+            | TIL error {: parser.report_error("worng til structure", ""); :};
 //WHILE END
 
 //SWITCH 
@@ -140,11 +187,10 @@ FOR_S ::= REP PARIZQ DECLARE_FOR LogicalA END DECLARE_FOR PARDER FOR_A REPEND;
 //SWITCH END
 
 PROGRAM_BODY ::= DECLARE_S PROGRAM_BODY 
-            | IF_S PROGRAM_BODY 
-            | FOR_S PROGRAM_BODY 
+            | IF_S PROGRAM_BODY
+            | FOR_S PROGRAM_BODY
             | WHILE_S PROGRAM_BODY 
-            | SWITCH_S PROGRAM_BODY 
-            | error IF_A    {: parser.report_error("ELSE sin IF"); :}
+            | SWITCH_S PROGRAM_BODY
             | ;
 
 PROGRAM ::= MAIN PROGRAM_BODY MAINEND;

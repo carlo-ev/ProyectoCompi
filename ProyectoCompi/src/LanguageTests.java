@@ -11,13 +11,7 @@
 public class LanguageTests {
     
     public static void main(String[] args) {
-        if (true == true != false) {
-            System.out.println("yes");
-        }
-        for (int i = 0; i < 10; i++) {
-            
-            System.out.println("Hola");
-        }
+       
     }
     
 }
