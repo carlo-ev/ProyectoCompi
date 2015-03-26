@@ -1,1 +1,16 @@
-dasdasdasd
+run
+
+	set( algo )
+		opt( esto )
+			con(true)
+			/con
+			out
+		opt( algo )
+			out
+		any
+		opt( mas )
+			out
+		any
+	/set
+
+/run

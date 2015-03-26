@@ -8,15 +8,73 @@ package proyectocompi;
 /** CUP generated class containing symbol constants. */
 public class sym {
   /* terminals */
-  public static final int MAINEND = 3;
-  public static final int error = 1;
-  public static final int MAIN = 2;
+  public static final int AND = 21;
+  public static final int OR = 22;
+  public static final int OPT = 14;
+  public static final int REP = 5;
+  public static final int EQUAL = 28;
+  public static final int YETEND = 11;
+  public static final int THEN = 15;
+  public static final int NOTEQUAL = 29;
+  public static final int NOT = 30;
+  public static final int MAINEND = 20;
+  public static final int PARIZQ = 31;
+  public static final int END = 4;
+  public static final int CONDEND = 9;
+  public static final int GREATEREQUALTHAN = 25;
+  public static final int PARDER = 32;
+  public static final int ID = 3;
+  public static final int SETEND = 13;
+  public static final int LESSTHAN = 23;
   public static final int EOF = 0;
+  public static final int MAIN = 19;
+  public static final int SET = 12;
+  public static final int ANY = 16;
+  public static final int REPEND = 6;
+  public static final int TIL = 17;
+  public static final int error = 1;
+  public static final int LESSEQUALTHAN = 27;
+  public static final int COND = 8;
+  public static final int TILEND = 18;
+  public static final int BOOL = 2;
+  public static final int OUT = 7;
+  public static final int LESSTHEN = 26;
+  public static final int GREATERTHAN = 24;
+  public static final int YET = 10;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
+  "BOOL",
+  "ID",
+  "END",
+  "REP",
+  "REPEND",
+  "OUT",
+  "COND",
+  "CONDEND",
+  "YET",
+  "YETEND",
+  "SET",
+  "SETEND",
+  "OPT",
+  "THEN",
+  "ANY",
+  "TIL",
+  "TILEND",
   "MAIN",
-  "MAINEND"
+  "MAINEND",
+  "AND",
+  "OR",
+  "LESSTHAN",
+  "GREATERTHAN",
+  "GREATEREQUALTHAN",
+  "LESSTHEN",
+  "LESSEQUALTHAN",
+  "EQUAL",
+  "NOTEQUAL",
+  "NOT",
+  "PARIZQ",
+  "PARDER"
   };
 }
 

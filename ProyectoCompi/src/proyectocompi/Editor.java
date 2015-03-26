@@ -11,6 +11,9 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java_cup.runtime.Scanner;
+import java_cup.runtime.Symbol;
+import javax.swing.ImageIcon;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -35,6 +38,8 @@ public class Editor extends javax.swing.JFrame {
     
     public Editor() {
         initComponents();
+        ImageIcon img = new ImageIcon("icon.png");
+        this.setIconImage( img.getImage() );
         TextLineNumber tln = new TextLineNumber(editorTextArea);
         editorScroll.setRowHeaderView( tln );
         fileChooser.setAcceptAllFileFilterUsed(false);
@@ -159,6 +164,7 @@ public class Editor extends javax.swing.JFrame {
 
         editorTextArea.setColumns(20);
         editorTextArea.setRows(5);
+        editorTextArea.setTabSize(2);
         editorScroll.setViewportView(editorTextArea);
 
         outputPane.setBackground(new java.awt.Color(0, 0, 0));
@@ -298,9 +304,17 @@ public class Editor extends javax.swing.JFrame {
         LenguajeCompi lexer;
         try{
             lexer = new LenguajeCompi(this.currentFileManager.getCurrentFile());
-            lexer.setOutputArea(this.outputPane);
-            lexer.yylex();
-            System.out.println(lexer.getLexErrors());
+            //lexer.setOutputArea(this.outputPane);
+            Analizador parse = new Analizador( new Scanner() {
+
+                @Override
+                public Symbol next_token() throws Exception {
+                    return lexer.next_token(); //To change body of generated methods, choose Tools | Templates.
+                }
+                
+            } );
+            parse.parse();
+            //System.out.println(lexer.getLexErrors());
         }catch(Exception ex){
             System.out.println("done creating lexer");
         }

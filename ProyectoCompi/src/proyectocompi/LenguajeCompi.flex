@@ -39,12 +39,11 @@ out = out
 condition = con
 conditionEnd = \/con
 yet = yet
-yetEnd = \/yet
+yetend = \/yet
 
 set = set
 setEnd = \/set
 option = opt
-optionEnd = \/opt
 any = any
 
 then = \>>
@@ -116,6 +115,10 @@ include = inc
 	}
 %}
 
+%eofval{
+    return new Symbol(sym.EOF);
+%eofval}
+
 %%
 
 <YYINITIAL>
@@ -129,30 +132,31 @@ include = inc
 	{symbol} 			{return new Symbol(Sym.SYM);}
 	{cadena}			{return new Symbol(Sym.STR);}
 	{assign}			{return new Symbol(Sym.ASSIGN);}
-	{terminal} 			{return new Symbol(Sym.END);}
+*/
+        {terminal} 			{return new Symbol(sym.END);}
 
-	{repetition} 		{return new Symbol(Sym.REP);}
-	{repetitionEnd} 	{return new Symbol(Sym.REPEND);}
-	{out} 				{return new Symbol(Sym.OUT);}
+	{repetition}                    {return new Symbol(sym.REP);}
+	{repetitionEnd}                 {return new Symbol(sym.REPEND);}
+	{out} 				{return new Symbol(sym.OUT);}
 
-	{condition} 		{return new Symbol(Sym.COND);}
-	{conditionEnd} 		{return new Symbol(Sym.CONDEND);}
-	{yet} 				{return new Symbol(Sym.YET);}
-	{yetEnd} 			{return new Symbol(Sym.YETEND);}
+	{condition}                     {return new Symbol(sym.COND);}
+	{conditionEnd}                  {return new Symbol(sym.CONDEND);}
+	{yet} 				{return new Symbol(sym.YET);}
+        {yetend}                        {return new Symbol(sym.YETEND);}
 	
-	{set} 				{return new Symbol(Sym.SET);}
-	{setEnd} 			{return new Symbol(Sym.SETEND);}
-	{option} 			{return new Symbol(Sym.OPT);}
-	{optionEnd} 		{return new Symbol(Sym.OPTEND);}
-	{then}				{return new Symbol(Sym.THEN);}
-	{any}				{return new Symbol(Sym.ANY);}
+	{set} 				{return new Symbol(sym.SET);}
+	{setEnd} 			{return new Symbol(sym.SETEND);}
+	{option} 			{return new Symbol(sym.OPT);}
+	{then}				{return new Symbol(sym.THEN);}
+	{any}				{return new Symbol(sym.ANY);}
 
-	{til}				{return new Symbol(Sym.TIL);}
-	{tilEnd}			{return new Symbol(Sym.TILEND);}
-*/	
+	{til}				{return new Symbol(sym.TIL);}
+	{tilEnd}			{return new Symbol(sym.TILEND);}
+	
 	{main} 				{return new Symbol(sym.MAIN);}
 	{mainEnd}		 	{return new Symbol(sym.MAINEND);}
-/*	{act} 				{return new Symbol(Sym.ACT);}
+/*	
+        {act} 				{return new Symbol(Sym.ACT);}
 	{actEnd} 			{return new Symbol(Sym.ACTEND);}
 	{return} 			{return new Symbol(Sym.RET);}
 	{void} 				{return new Symbol(Sym.NIL);}
@@ -162,54 +166,37 @@ include = inc
 	{mult}				{return new Symbol(Sym.MULT);}
 	{div}				{return new Symbol(Sym.DIV);}
 	{mod}				{return new Symbol(Sym.MOD);}
-
-	{and}				{return new Symbol(Sym.AND);}
-	{or}				{return new Symbol(Sym.OR);}
-	{lessThan}			{return new Symbol(Sym.LESSTHAN);}
-	{greaterThan}		{return new Symbol(Sym.GREATERTHAN);}
-	{lessEqualThan}		{return new Symbol(Sym.LESSEQUALTHAN);}
-	{greaterEqualThan}	{return new Symbol(Sym.GREATEREQUALTHAN);}
-	{equal}				{return new Symbol(Sym.EQUAL);}
-	{unEqual}			{return new Symbol(Sym.NOTEQUAL);}
-	{not}				{return new Symbol(Sym.NOT);}
-
+*/
+	{and}				{return new Symbol(sym.AND);}
+	{or}				{return new Symbol(sym.OR);}
+	{lessThan}			{return new Symbol(sym.LESSTHAN);}
+	{greaterThan}                   {return new Symbol(sym.GREATERTHAN);}
+	{lessEqualThan}                 {return new Symbol(sym.LESSEQUALTHAN);}
+	{greaterEqualThan}              {return new Symbol(sym.GREATEREQUALTHAN);}
+	{equal}				{return new Symbol(sym.EQUAL);}
+	{unEqual}			{return new Symbol(sym.NOTEQUAL);}
+	{not}				{return new Symbol(sym.NOT);}
+/*
 	{dot}				{return new Symbol(Sym.DOT);}
 	{comma}				{return new Symbol(Sym.COMMA);}
-	{parIzq}			{return new Symbol(Sym.PARIZQ);}
-	{parDer}			{return new Symbol(Sym.PARDER);}
-	{braketIzq}			{return new Symbol(Sym.BRAIZQ);}
+*/
+        {parIzq}			{return new Symbol(sym.PARIZQ);}
+	{parDer}			{return new Symbol(sym.PARDER);}
+/*
+        {braketIzq}			{return new Symbol(Sym.BRAIZQ);}
 	{braketDer}			{return new Symbol(Sym.BRADER);}
-	{commentStart}		{yybegin(COMMENTS);}
+	{commentStart}                  {yybegin(COMMENTS);}
 	{include}			{return new Symbol(Sym.INCLUDE);}
+*/
+//	{digit}				{return new Symbol( sym.DIGIT, Integer.parseInt(yytext()) );}
+	{boolean}			{return new Symbol( sym.BOOL, new Boolean(yytext()) );}
+//	{string}			{return new Symbol( sym.STRING, new String(yytext()) );}
+//	{character}			{return new Symbol( sym.CHAR, yytext().charAt(0) );}
+//	{float}				{return new Symbol( sym.FLOAT, new Float(yytext()) );}
 
-	{digit}				{return new Symbol(Sym.DIGIT, yytext());}
-	{boolean}			{return new Symbol(Sym.BOOL);}
-	{string}			{return new Symbol(Sym.STRING, yytext());}
-	{character}			{return new Symbol(Sym.CHAR, yytext());}
-	{float}				{return new Symbol(Sym.FLOAT, yytext());}
-
-	*/
-	
-	
-	{number} 			{return new symbol(sym.NUM);}
-	{binary} 			{return new Symbol(sym.BIN);}
-	{decimal} 			{return new Symbol(sym.DEC);}
-	{symbol} 			{return new Symbol(sym.SYM);}
-	{cadena}			{return new Symbol(sym.STR);}
-
-	{assign}			{return new Symbol(sym.ASSIGN);}
-	{terminal} 			{return new Symbol(sym.END);}
-	{digit}				{return new Symbol(sym.DIGIT, yytext());}
-
-	{plus}				{return new Symbol(sym.PLUS);}
-	{minus}				{return new Symbol(sym.MINUS);}
-	{mult}				{return new Symbol(sym.MULT);}
-	{div}				{return new Symbol(sym.DIV);}
-	{mod}				{return new Symbol(sym.MOD);}
-	{id}				{return new symbol(sym.ID, yytext());}
+	{id}				{return new Symbol(sym.ID, yytext());}
 	{whitespace}		{}
 	. 					{this.printOutput("Unknown Token: "+yytext()+" in Line "+Integer.toString(yyline)+" Column "+Integer.toString(yycolumn) );}
-
 
 } 
 <COMMENTS>{
