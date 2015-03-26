@@ -3,18 +3,40 @@ package proyectocompi;
 import java_cup.runtime.*;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import javax.swing.JTextArea;
+
+parser code
+{:
+    
+    public JTextArea outputArea;
+    
+    public void report_error(String message){
+        this.outputArea.append(message);
+    }
+
+    public void setOutput(JTextArea out){
+        this.outputArea = out;
+    }
+
+:}
+
 
 //TERMINALES
-/*
+
 // Tipos
 terminal NUM, BIN, DEC, SYM, STR;
-// Valores
-*/
 
-terminal BOOL;//, DIGIT,CHAR, STRING, FLOAT;
+// Valores Con sus Java Types
+terminal java.lang.Boolean BOOL;
+terminal java.lang.Number DIGIT;
+terminal java.lang.Number FLOAT;
+terminal java.lang.Character CHAR;
+terminal java.lang.String STRING;
+terminal java.lang.String ID;
+//terminal BOOL, DIGIT,CHAR, STRING, FLOAT;
 
 // Statements
-terminal ID, END;//, ASSIGN;
+terminal END, ASSIGN;
 
 
 // Ciclo FOR
@@ -25,7 +47,7 @@ terminal COND, CONDEND, YET, YETEND;
 
 
 // SWITCH 
-terminal SET, SETEND, OPT, THEN, ANY;
+terminal SET, SETEND, OPT, ANY;//THEN;
 
 
 // WHILE
@@ -34,46 +56,95 @@ terminal TIL, TILEND;
 // Main & Funciones
 terminal MAIN, MAINEND;//, ACT, ACTEND, RET, NIL;
 
-/*
 // Operadores 
-terminal PLUS, MINUS, MULT, DIV, MOD, DOT;
-*/
+terminal PLUS, MINUS, MULT, DIV, MOD;//, DOT;
 
 // Operadores Logicos
-terminal AND, OR, LESSTHAN, GREATERTHAN, GREATEREQUALTHAN, LESSTHEN, LESSEQUALTHAN, EQUAL, NOTEQUAL, NOT;
+terminal AND, OR, LESSTHAN, GREATERTHAN, GREATEREQUALTHAN, LESSEQUALTHAN, EQUAL, NOTEQUAL, NOT;
 
 // Fillers
-terminal PARIZQ, PARDER;//, COMMA, BRAIZQ, BRADER, INCLUDE;
+terminal PARIZQ, PARDER, COMMA;//, BRAIZQ, BRADER, INCLUDE;
 
 //NO TEMRINALES
 non terminal PROGRAM, PROGRAM_BODY;
-//non terminal EXP_BOOL;
-non terminal IF_S, IF_A, FOR_S, FOR_A, WHILE_S, WHILE_A, SWITCH_S, SWITCH_A, SWITCH_B, SWITCH_C;
 
+non terminal IF_S, IF_A, FOR_S, FOR_A, WHILE_S, WHILE_A, SWITCH_S, SWITCH_A, SWITCH_B, SWITCH_C, SWITCH_TYPES;
+
+
+//Sept No Terminales
+non terminal DECLARE_S, DECLARE_A, DECLARE_B, DECLARE_FOR, TYPES, LITERALS, ARIT, E, T, F;
+non terminal LogicalOperators, Concat, Negation, LogicalA, LogicalB;
+non terminal ELogical, TLogical, FLogical;
 
 start with PROGRAM;
 
+TYPES ::= NUM | DEC | BIN | SYM | STR;
+LITERALS ::= BOOL | DIGIT | FLOAT | CHAR | STRING | ID;
+
+//DECLARACION
+DECLARE_B ::= ID COMMA DECLARE_B | ID;
+DECLARE_A ::= ID ASSIGN ARIT;
+DECLARE_S ::= TYPES DECLARE_A | TYPES DECLARE_B END | DECLARE_A;
+//DECLARACION END
+
+//DECLARACION PARA EL FOR
+DECLARE_FOR ::= TYPES ID ASSIGN E | ID ASSIGN E;
+//CASO ESPECIAL
+
+//ARIT OPERATION
+ARIT ::= E END;
+E ::= E PLUS T | E MINUS T | T;
+T ::= T MULT F | T DIV F | T MOD F | F;
+F ::= LITERALS | PARIZQ E PARDER;
+//ARIT OPERATION END
+
+
+
+Concat ::= AND | OR;
+Negation ::= NOT | ;
+LogicalOperators ::= LESSTHAN | GREATERTHAN | LESSEQUALTHAN | GREATEREQUALTHAN | EQUAL | NOTEQUAL;
+
+//Logical Operations
+LogicalA ::= LogicalA Concat LogicalB | LogicalB;
+LogicalB ::= ELogical LogicalOperators LogicalB | ELogical;
+
+//Arithmetic Operations for Logical Statements.
+ELogical ::= ELogical PLUS TLogical | ELogical MINUS TLogical | TLogical;
+TLogical ::= TLogical MULT FLogical | TLogical DIV FLogical | TLogical MOD FLogical | FLogical;
+FLogical ::= Negation LITERALS| Negation PARIZQ LogicalA PARDER;
+
+
+
+
 //IF 
 IF_A ::= YET PROGRAM_BODY YETEND | ;
-IF_S ::= COND PARIZQ BOOL PARDER PROGRAM_BODY CONDEND IF_A;
+IF_S ::= COND PARIZQ LogicalA PARDER PROGRAM_BODY CONDEND IF_A;
 // IF END
 
 //FOR 
 FOR_A ::= PROGRAM_BODY | PROGRAM_BODY OUT END;
-FOR_S ::= REP PARIZQ ID END ID END ID PARDER FOR_A REPEND;  
+FOR_S ::= REP PARIZQ DECLARE_FOR LogicalA END DECLARE_FOR PARDER FOR_A REPEND;  
 //FOR END
 
 //WHILE
     WHILE_A ::= PROGRAM_BODY | PROGRAM_BODY OUT END;
-    WHILE_S ::= TIL PARIZQ BOOL PARDER WHILE_A TILEND;
+    WHILE_S ::= TIL PARIZQ LogicalA PARDER WHILE_A TILEND;
 //WHILE END
 
 //SWITCH 
-    SWITCH_C ::= SWITCH_C OPT PARIZQ ID PARDER PROGRAM_BODY | SWITCH_C OPT PARIZQ ID PARDER PROGRAM_BODY OUT END | ;
-    SWITCH_A ::= SWITCH_C ANY PROGRAM_BODY SWITCH_C | SWITCH_C ANY PROGRAM_BODY SWITCH_C OUT END | SWITCH_C; 
+    SWITCH_TYPES ::= CHAR | DIGIT;
+    SWITCH_C ::= OUT END | ;
+    SWITCH_B ::= SWITCH_B OPT PARIZQ SWITCH_TYPES PARDER PROGRAM_BODY SWITCH_C | ;
+    SWITCH_A ::= SWITCH_B ANY PROGRAM_BODY SWITCH_C SWITCH_B | SWITCH_B; 
     SWITCH_S ::= SET PARIZQ ID PARDER SWITCH_A SETEND;
 //SWITCH END
 
-PROGRAM_BODY ::= ID END PROGRAM_BODY | IF_S PROGRAM_BODY | FOR_S PROGRAM_BODY | WHILE_S PROGRAM_BODY | SWITCH_S PROGRAM_BODY | ;
+PROGRAM_BODY ::= DECLARE_S PROGRAM_BODY 
+            | IF_S PROGRAM_BODY 
+            | FOR_S PROGRAM_BODY 
+            | WHILE_S PROGRAM_BODY 
+            | SWITCH_S PROGRAM_BODY 
+            | error IF_A    {: parser.report_error("ELSE sin IF"); :}
+            | ;
 
 PROGRAM ::= MAIN PROGRAM_BODY MAINEND;

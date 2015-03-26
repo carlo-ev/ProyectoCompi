@@ -11,11 +11,13 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.ArrayList;
 import java_cup.runtime.Scanner;
 import java_cup.runtime.Symbol;
 import javax.swing.ImageIcon;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
@@ -35,6 +37,8 @@ public class Editor extends javax.swing.JFrame {
     FileManager currentFileManager;
     boolean documentSaved = true;
     final JFileChooser fileChooser = new JFileChooser();
+    ArrayList<String> past = new ArrayList<String>();
+    ArrayList<String> future = new ArrayList<String>();
     
     public Editor() {
         initComponents();
@@ -76,9 +80,7 @@ public class Editor extends javax.swing.JFrame {
                 documentSaved = false;
             }
             @Override
-            public void changedUpdate(DocumentEvent e) {
-                documentSaved = false;
-            }
+            public void changedUpdate(DocumentEvent e) {    }
         });
         this.addWindowListener(new WindowAdapter(){
             @Override
@@ -151,6 +153,8 @@ public class Editor extends javax.swing.JFrame {
         barSaveButton = new javax.swing.JMenuItem();
         barExitButton = new javax.swing.JMenuItem();
         barEditMenu = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
         barClearButton = new javax.swing.JMenuItem();
         barCopyButton = new javax.swing.JMenuItem();
         barRunMenu = new javax.swing.JMenu();
@@ -165,13 +169,18 @@ public class Editor extends javax.swing.JFrame {
         editorTextArea.setColumns(20);
         editorTextArea.setRows(5);
         editorTextArea.setTabSize(2);
+        editorTextArea.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                editorKeyPress(evt);
+            }
+        });
         editorScroll.setViewportView(editorTextArea);
 
         outputPane.setBackground(new java.awt.Color(0, 0, 0));
         outputPane.setColumns(20);
+        outputPane.setFont(new java.awt.Font("Consolas", 1, 14)); // NOI18N
         outputPane.setForeground(java.awt.Color.green);
         outputPane.setRows(5);
-        outputPane.setText("Hola");
         outputScroll.setViewportView(outputPane);
 
         outputLabel.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
@@ -214,6 +223,24 @@ public class Editor extends javax.swing.JFrame {
         topMenuBar.add(barFileMenu);
 
         barEditMenu.setText("Edit");
+
+        jMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Z, java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItem1.setText("Undo");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        barEditMenu.add(jMenuItem1);
+
+        jMenuItem2.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Y, java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItem2.setText("Redo");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        barEditMenu.add(jMenuItem2);
 
         barClearButton.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_BACK_SPACE, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.CTRL_MASK));
         barClearButton.setText("Clear Editor");
@@ -299,8 +326,8 @@ public class Editor extends javax.swing.JFrame {
     }//GEN-LAST:event_barClearButtonActionPerformed
 
     private void barCheckButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_barCheckButtonActionPerformed
-        // Cup code here!
         this.currentFileManager.writeContent();
+        LenguajeCompi.outputArea = this.outputPane;
         LenguajeCompi lexer;
         try{
             lexer = new LenguajeCompi(this.currentFileManager.getCurrentFile());
@@ -313,6 +340,7 @@ public class Editor extends javax.swing.JFrame {
                 }
                 
             } );
+            parse.setOutput(this.outputPane);
             parse.parse();
             //System.out.println(lexer.getLexErrors());
         }catch(Exception ex){
@@ -344,6 +372,33 @@ public class Editor extends javax.swing.JFrame {
         board.setContents(contentSelection, null);
     }//GEN-LAST:event_barCopyButtonActionPerformed
 
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        // TODO add your handling code here:
+        System.out.println("Undo!");
+        if(!past.isEmpty()){
+            future.add( editorTextArea.getText() );
+            editorTextArea.setText( past.remove(past.size()-1) );
+        }
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        // TODO add your handling code here:
+        System.out.println("Redo!");
+        if (!future.isEmpty()) {
+            past.add( editorTextArea.getText() );
+            editorTextArea.setText( future.remove(future.size()-1));
+        }
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void editorKeyPress(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_editorKeyPress
+        // TODO add your handling code here:
+        
+        if (!evt.isActionKey() && !evt.isControlDown()) {
+            past.add( editorTextArea.getText() );
+            future.removeAll(future);
+        }
+    }//GEN-LAST:event_editorKeyPress
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem barCheckButton;
     private javax.swing.JMenuItem barClearButton;
@@ -358,6 +413,8 @@ public class Editor extends javax.swing.JFrame {
     private javax.swing.JLabel documentBar;
     private javax.swing.JScrollPane editorScroll;
     private javax.swing.JTextArea editorTextArea;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JLabel outputLabel;
     private javax.swing.JTextArea outputPane;

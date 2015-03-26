@@ -16,7 +16,7 @@ import java_cup.runtime.*;
 digit = [0-9]+
 boolean = (true|false)
 character = '(.|\s)'
-string = "(.|\s|\t|\n)*"
+string = " \"(.|\s|\t|\n)*\" "
 float = {digit}(\.[0.-9]{1,2})?
 whitespace = [\s|\t\|\r|\n]+
 
@@ -77,7 +77,7 @@ or = or
 lessThan = <
 greaterThan = >
 lessEqualThan = <=
-greaterEqualThan = >=
+greaterEqualThan = ">="
 equal = (==)
 unEqual = (\!=)
 not = [not|!]
@@ -96,22 +96,14 @@ include = inc
 %state COMMENTS
 
 %{
-	public JTextArea outputArea;
-	public ArrayList<String> lexErrors = new ArrayList<String>();
-
-	public void setOutputArea(JTextArea output){
-		this.outputArea = output;
-	}
+	public static JTextArea outputArea;
+	public static ArrayList<String> lexErrors = new ArrayList<String>();
 
 	public void printOutput(String outputLine){
-		if(this.outputArea != null){
-			this.outputArea.append(outputLine + "\n");
+		if(outputArea != null){
+			outputArea.append(outputLine + "\n");
 		} 
-		this.lexErrors.add(outputLine);
-	}
-
-	public ArrayList getLexErrors(){
-		return this.lexErrors;
+		lexErrors.add(outputLine);
 	}
 %}
 
@@ -123,16 +115,13 @@ include = inc
 
 <YYINITIAL>
 {
+	{number} 			{return new Symbol(sym.NUM);}
+	{binary} 			{return new Symbol(sym.BIN);}
+	{decimal} 			{return new Symbol(sym.DEC);}
+	{symbol} 			{return new Symbol(sym.SYM);}
+	{cadena}			{return new Symbol(sym.STR);}
+	{assign}			{return new Symbol(sym.ASSIGN);}
 
-	
-/*
-	{number} 			{return new symbol(Sym.NUM);}
-	{binary} 			{return new Symbol(Sym.BIN);}
-	{decimal} 			{return new Symbol(Sym.DEC);}
-	{symbol} 			{return new Symbol(Sym.SYM);}
-	{cadena}			{return new Symbol(Sym.STR);}
-	{assign}			{return new Symbol(Sym.ASSIGN);}
-*/
         {terminal} 			{return new Symbol(sym.END);}
 
 	{repetition}                    {return new Symbol(sym.REP);}
@@ -147,7 +136,7 @@ include = inc
 	{set} 				{return new Symbol(sym.SET);}
 	{setEnd} 			{return new Symbol(sym.SETEND);}
 	{option} 			{return new Symbol(sym.OPT);}
-	{then}				{return new Symbol(sym.THEN);}
+//	{then}				{return new Symbol(sym.THEN);}
 	{any}				{return new Symbol(sym.ANY);}
 
 	{til}				{return new Symbol(sym.TIL);}
@@ -156,17 +145,17 @@ include = inc
 	{main} 				{return new Symbol(sym.MAIN);}
 	{mainEnd}		 	{return new Symbol(sym.MAINEND);}
 /*	
-        {act} 				{return new Symbol(Sym.ACT);}
-	{actEnd} 			{return new Symbol(Sym.ACTEND);}
-	{return} 			{return new Symbol(Sym.RET);}
-	{void} 				{return new Symbol(Sym.NIL);}
-
-	{plus}				{return new Symbol(Sym.PLUS);}
-	{minus}				{return new Symbol(Sym.MINUS);}
-	{mult}				{return new Symbol(Sym.MULT);}
-	{div}				{return new Symbol(Sym.DIV);}
-	{mod}				{return new Symbol(Sym.MOD);}
+        {act} 				{return new Symbol(sym.ACT);}
+	{actEnd} 			{return new Symbol(sym.ACTEND);}
+	{return} 			{return new Symbol(sym.RET);}
+	{void} 				{return new Symbol(sym.NIL);}
 */
+	{plus}				{return new Symbol(sym.PLUS);}
+	{minus}				{return new Symbol(sym.MINUS);}
+	{mult}				{return new Symbol(sym.MULT);}
+	{div}				{return new Symbol(sym.DIV);}
+	{mod}				{return new Symbol(sym.MOD);}
+
 	{and}				{return new Symbol(sym.AND);}
 	{or}				{return new Symbol(sym.OR);}
 	{lessThan}			{return new Symbol(sym.LESSTHAN);}
@@ -177,26 +166,26 @@ include = inc
 	{unEqual}			{return new Symbol(sym.NOTEQUAL);}
 	{not}				{return new Symbol(sym.NOT);}
 /*
-	{dot}				{return new Symbol(Sym.DOT);}
-	{comma}				{return new Symbol(Sym.COMMA);}
+	{dot}				{return new Symbol(sym.DOT);}
 */
+	{comma}				{return new Symbol(sym.COMMA);}
         {parIzq}			{return new Symbol(sym.PARIZQ);}
 	{parDer}			{return new Symbol(sym.PARDER);}
 /*
-        {braketIzq}			{return new Symbol(Sym.BRAIZQ);}
-	{braketDer}			{return new Symbol(Sym.BRADER);}
+        {braketIzq}			{return new Symbol(sym.BRAIZQ);}
+	{braketDer}			{return new Symbol(sym.BRADER);}
 	{commentStart}                  {yybegin(COMMENTS);}
-	{include}			{return new Symbol(Sym.INCLUDE);}
+	{include}			{return new Symbol(sym.INCLUDE);}
 */
-//	{digit}				{return new Symbol( sym.DIGIT, Integer.parseInt(yytext()) );}
+	{digit}				{return new Symbol( sym.DIGIT, Integer.parseInt(yytext()) );}
 	{boolean}			{return new Symbol( sym.BOOL, new Boolean(yytext()) );}
-//	{string}			{return new Symbol( sym.STRING, new String(yytext()) );}
-//	{character}			{return new Symbol( sym.CHAR, yytext().charAt(0) );}
-//	{float}				{return new Symbol( sym.FLOAT, new Float(yytext()) );}
+	{string}			{return new Symbol( sym.STRING, new String(yytext()) );}
+	{character}			{return new Symbol( sym.CHAR, yytext().charAt(0) );}
+	{float}				{return new Symbol( sym.FLOAT, new Float(yytext()) );}
 
 	{id}				{return new Symbol(sym.ID, yytext());}
 	{whitespace}		{}
-	. 					{this.printOutput("Unknown Token: "+yytext()+" in Line "+Integer.toString(yyline)+" Column "+Integer.toString(yycolumn) );}
+	. 				{this.printOutput("> Unknown Token: '"+yytext()+"' in Line "+Integer.toString(yyline)+" Column "+Integer.toString(yycolumn) );}
 
 } 
 <COMMENTS>{

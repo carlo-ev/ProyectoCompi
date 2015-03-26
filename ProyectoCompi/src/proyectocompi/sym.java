@@ -8,45 +8,69 @@ package proyectocompi;
 /** CUP generated class containing symbol constants. */
 public class sym {
   /* terminals */
-  public static final int AND = 21;
-  public static final int OR = 22;
-  public static final int OPT = 14;
-  public static final int REP = 5;
-  public static final int EQUAL = 28;
-  public static final int YETEND = 11;
-  public static final int THEN = 15;
-  public static final int NOTEQUAL = 29;
-  public static final int NOT = 30;
-  public static final int MAINEND = 20;
-  public static final int PARIZQ = 31;
-  public static final int END = 4;
-  public static final int CONDEND = 9;
-  public static final int GREATEREQUALTHAN = 25;
-  public static final int PARDER = 32;
-  public static final int ID = 3;
-  public static final int SETEND = 13;
-  public static final int LESSTHAN = 23;
+  public static final int GREATERTHAN = 38;
+  public static final int ANY = 25;
+  public static final int MULT = 32;
+  public static final int CHAR = 10;
+  public static final int STR = 6;
+  public static final int REPEND = 16;
+  public static final int REP = 15;
+  public static final int NOTEQUAL = 42;
+  public static final int COND = 18;
+  public static final int OUT = 17;
+  public static final int MINUS = 31;
+  public static final int SETEND = 23;
+  public static final int YET = 20;
+  public static final int NOT = 43;
+  public static final int AND = 35;
+  public static final int CONDEND = 19;
+  public static final int LESSTHAN = 37;
+  public static final int OR = 36;
+  public static final int COMMA = 46;
+  public static final int BOOL = 7;
+  public static final int YETEND = 21;
+  public static final int DIV = 33;
+  public static final int TILEND = 27;
+  public static final int NUM = 2;
+  public static final int DIGIT = 8;
+  public static final int PLUS = 30;
+  public static final int ASSIGN = 14;
+  public static final int MAIN = 28;
+  public static final int ID = 12;
+  public static final int PARIZQ = 44;
   public static final int EOF = 0;
-  public static final int MAIN = 19;
-  public static final int SET = 12;
-  public static final int ANY = 16;
-  public static final int REPEND = 6;
-  public static final int TIL = 17;
+  public static final int GREATEREQUALTHAN = 39;
+  public static final int EQUAL = 41;
   public static final int error = 1;
-  public static final int LESSEQUALTHAN = 27;
-  public static final int COND = 8;
-  public static final int TILEND = 18;
-  public static final int BOOL = 2;
-  public static final int OUT = 7;
-  public static final int LESSTHEN = 26;
-  public static final int GREATERTHAN = 24;
-  public static final int YET = 10;
+  public static final int SYM = 5;
+  public static final int MOD = 34;
+  public static final int MAINEND = 29;
+  public static final int TIL = 26;
+  public static final int BIN = 3;
+  public static final int LESSEQUALTHAN = 40;
+  public static final int FLOAT = 9;
+  public static final int END = 13;
+  public static final int STRING = 11;
+  public static final int OPT = 24;
+  public static final int DEC = 4;
+  public static final int PARDER = 45;
+  public static final int SET = 22;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
+  "NUM",
+  "BIN",
+  "DEC",
+  "SYM",
+  "STR",
   "BOOL",
+  "DIGIT",
+  "FLOAT",
+  "CHAR",
+  "STRING",
   "ID",
   "END",
+  "ASSIGN",
   "REP",
   "REPEND",
   "OUT",
@@ -57,24 +81,28 @@ public class sym {
   "SET",
   "SETEND",
   "OPT",
-  "THEN",
   "ANY",
   "TIL",
   "TILEND",
   "MAIN",
   "MAINEND",
+  "PLUS",
+  "MINUS",
+  "MULT",
+  "DIV",
+  "MOD",
   "AND",
   "OR",
   "LESSTHAN",
   "GREATERTHAN",
   "GREATEREQUALTHAN",
-  "LESSTHEN",
   "LESSEQUALTHAN",
   "EQUAL",
   "NOTEQUAL",
   "NOT",
   "PARIZQ",
-  "PARDER"
+  "PARDER",
+  "COMMA"
   };
 }
 
