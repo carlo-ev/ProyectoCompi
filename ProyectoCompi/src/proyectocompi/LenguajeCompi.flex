@@ -10,6 +10,7 @@ import java_cup.runtime.*;
 %line
 %column
 %int
+%extends sym
 %cup
 
 //Values
@@ -144,10 +145,11 @@ include = inc
 	
 	{main} 				{return new Symbol(sym.MAIN);}
 	{mainEnd}		 	{return new Symbol(sym.MAINEND);}
-/*	
+
         {act} 				{return new Symbol(sym.ACT);}
 	{actEnd} 			{return new Symbol(sym.ACTEND);}
 	{return} 			{return new Symbol(sym.RET);}
+/*
 	{void} 				{return new Symbol(sym.NIL);}
 */
 	{plus}				{return new Symbol(sym.PLUS);}
@@ -171,10 +173,11 @@ include = inc
 	{comma}				{return new Symbol(sym.COMMA);}
         {parIzq}			{return new Symbol(sym.PARIZQ);}
 	{parDer}			{return new Symbol(sym.PARDER);}
+
+	{commentStart}                  {yybegin(COMMENTS);}
 /*
         {braketIzq}			{return new Symbol(sym.BRAIZQ);}
 	{braketDer}			{return new Symbol(sym.BRADER);}
-	{commentStart}                  {yybegin(COMMENTS);}
 	{include}			{return new Symbol(sym.INCLUDE);}
 */
 	{digit}				{return new Symbol( sym.DIGIT, Integer.parseInt(yytext()) );}

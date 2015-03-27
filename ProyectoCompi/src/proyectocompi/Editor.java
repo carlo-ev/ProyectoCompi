@@ -109,7 +109,8 @@ public class Editor extends javax.swing.JFrame {
             switch(eleccion){
                 case 0: this.currentFileManager.writeContent(); System.exit(0); break;
                 case 1: System.exit(0); break;
-                case 2: default: break;
+                case 2: default: 
+                    return;
             }
         }
     }
@@ -328,23 +329,24 @@ public class Editor extends javax.swing.JFrame {
     private void barCheckButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_barCheckButtonActionPerformed
         this.currentFileManager.writeContent();
         LenguajeCompi.outputArea = this.outputPane;
+        if (this.outputPane.getText().trim().isEmpty()) {
+            return;
+        }
+        
         LenguajeCompi lexer;
         try{
             lexer = new LenguajeCompi(this.currentFileManager.getCurrentFile());
             //lexer.setOutputArea(this.outputPane);
-            Analizador parse = new Analizador( new Scanner() {
-
-                @Override
-                public Symbol next_token() throws Exception {
-                    return lexer.next_token(); //To change body of generated methods, choose Tools | Templates.
-                }
-                
-            } );
+            this.outputPane.setText("");
+            Analizador parse = new Analizador(lexer);
             parse.setOutput(this.outputPane);
             parse.parse();
+            if (parse.errors == 0 && LenguajeCompi.lexErrors.size() == 0) {
+                this.outputPane.append("> Successful Code Parsing! < \n");
+            }
             //System.out.println(lexer.getLexErrors());
         }catch(Exception ex){
-            System.out.println("done creating lexer");
+            System.out.println("Parser Crashed Unexpectedly");
         }
     }//GEN-LAST:event_barCheckButtonActionPerformed
 
@@ -374,7 +376,6 @@ public class Editor extends javax.swing.JFrame {
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         // TODO add your handling code here:
-        System.out.println("Undo!");
         if(!past.isEmpty()){
             future.add( editorTextArea.getText() );
             editorTextArea.setText( past.remove(past.size()-1) );
