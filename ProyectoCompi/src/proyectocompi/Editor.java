@@ -12,15 +12,14 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.ArrayList;
-import java_cup.runtime.Scanner;
-import java_cup.runtime.Symbol;
+import java.util.HashMap;
 import javax.swing.ImageIcon;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
+import javax.swing.WindowConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -39,13 +38,23 @@ public class Editor extends javax.swing.JFrame {
     final JFileChooser fileChooser = new JFileChooser();
     ArrayList<String> past = new ArrayList<String>();
     ArrayList<String> future = new ArrayList<String>();
+    HashMap<String, String> shortcuts = new HashMap<String, String>();
     
     public Editor() {
         initComponents();
+        
+        //Parser Setup
+        TieLexer.outputArea = this.outputPane;
+        
+        //Window Icon
         ImageIcon img = new ImageIcon("icon.png");
+        
+        //Editor Line Numbering
         this.setIconImage( img.getImage() );
         TextLineNumber tln = new TextLineNumber(editorTextArea);
         editorScroll.setRowHeaderView( tln );
+        
+        //File Chooser Conf
         fileChooser.setAcceptAllFileFilterUsed(false);
         fileChooser.setFileHidingEnabled(false);
         fileChooser.addChoosableFileFilter(new FileFilter() {
@@ -61,33 +70,41 @@ public class Editor extends javax.swing.JFrame {
                             return true;
                         default: return false;
                     }
-                }else{
+                }else
                     return false;
-                }
             }
             @Override
             public String getDescription() {
                 return  " *.tie & *.txt ";
             }
         });
+        
+        //Editor Area Change Events 
         this.editorTextArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
-            public void insertUpdate(DocumentEvent e) {
-                documentSaved = false;
-            }
+            public void insertUpdate(DocumentEvent e) { documentSaved = false; }
             @Override
-            public void removeUpdate(DocumentEvent e) {
-                documentSaved = false;
-            }
+            public void removeUpdate(DocumentEvent e) { documentSaved = false; }
             @Override
-            public void changedUpdate(DocumentEvent e) {    }
+            public void changedUpdate(DocumentEvent e) {   }
         });
+        
+        //Program Close Events
+        this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new WindowAdapter(){
             @Override
             public void windowClosing(WindowEvent event){
                 onProgramExit();
             }
         });
+        
+        //Editor Shortcuts
+        shortcuts.put("run", "\n\n\n/run");
+        shortcuts.put("rep", "(num i=0;i<10;i=i+1)\n\n/rep");
+        shortcuts.put("set", "(id)\nopt 1\n\n/opt\n\n/set");
+        shortcuts.put("act", " funcion1()\n\n/act");
+        shortcuts.put("#*", "\n\n*#");
+        shortcuts.put("con", "(true)\n\n/con");
     }
     
     public static String getExtension(File f) {
@@ -101,7 +118,7 @@ public class Editor extends javax.swing.JFrame {
     }
     
     public void onProgramExit(){
-        if (documentSaved) {
+        if (documentSaved || this.currentFileManager.isDefaultFile()) {
             System.exit(0);
         }else{
             Object[] options = { "Guardar y Salir", "Salir", "Cancelar"};
@@ -109,8 +126,7 @@ public class Editor extends javax.swing.JFrame {
             switch(eleccion){
                 case 0: this.currentFileManager.writeContent(); System.exit(0); break;
                 case 1: System.exit(0); break;
-                case 2: default: 
-                    return;
+                case 2: default:
             }
         }
     }
@@ -154,8 +170,8 @@ public class Editor extends javax.swing.JFrame {
         barSaveButton = new javax.swing.JMenuItem();
         barExitButton = new javax.swing.JMenuItem();
         barEditMenu = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
-        jMenuItem2 = new javax.swing.JMenuItem();
+        barUndoButton = new javax.swing.JMenuItem();
+        barRedoButton = new javax.swing.JMenuItem();
         barClearButton = new javax.swing.JMenuItem();
         barCopyButton = new javax.swing.JMenuItem();
         barRunMenu = new javax.swing.JMenu();
@@ -225,23 +241,23 @@ public class Editor extends javax.swing.JFrame {
 
         barEditMenu.setText("Edit");
 
-        jMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Z, java.awt.event.InputEvent.CTRL_MASK));
-        jMenuItem1.setText("Undo");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+        barUndoButton.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Z, java.awt.event.InputEvent.CTRL_MASK));
+        barUndoButton.setText("Undo");
+        barUndoButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
+                barUndoButtonActionPerformed(evt);
             }
         });
-        barEditMenu.add(jMenuItem1);
+        barEditMenu.add(barUndoButton);
 
-        jMenuItem2.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Y, java.awt.event.InputEvent.CTRL_MASK));
-        jMenuItem2.setText("Redo");
-        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+        barRedoButton.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Y, java.awt.event.InputEvent.CTRL_MASK));
+        barRedoButton.setText("Redo");
+        barRedoButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem2ActionPerformed(evt);
+                barRedoButtonActionPerformed(evt);
             }
         });
-        barEditMenu.add(jMenuItem2);
+        barEditMenu.add(barRedoButton);
 
         barClearButton.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_BACK_SPACE, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.CTRL_MASK));
         barClearButton.setText("Clear Editor");
@@ -328,23 +344,20 @@ public class Editor extends javax.swing.JFrame {
 
     private void barCheckButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_barCheckButtonActionPerformed
         this.currentFileManager.writeContent();
-        LenguajeCompi.outputArea = this.outputPane;
-        if (this.outputPane.getText().trim().isEmpty()) {
+        if (this.editorTextArea.getText().trim().isEmpty())
             return;
-        }
         
-        LenguajeCompi lexer;
+        TieLexer lexer;
         try{
-            lexer = new LenguajeCompi(this.currentFileManager.getCurrentFile());
+            lexer = new TieLexer(this.currentFileManager.getCurrentFile());
             //lexer.setOutputArea(this.outputPane);
             this.outputPane.setText("");
-            Analizador parse = new Analizador(lexer);
-            parse.setOutput(this.outputPane);
-            parse.parse();
-            if (parse.errors == 0 && LenguajeCompi.lexErrors.size() == 0) {
+            TieParser parser = new TieParser(lexer);
+            parser.setOutput(this.outputPane);
+            parser.parse();
+            if (parser.errors == 0 && TieLexer.lexErrors.isEmpty()) {
                 this.outputPane.append("> Successful Code Parsing! < \n");
             }
-            //System.out.println(lexer.getLexErrors());
         }catch(Exception ex){
             System.out.println("Parser Crashed Unexpectedly");
         }
@@ -374,27 +387,38 @@ public class Editor extends javax.swing.JFrame {
         board.setContents(contentSelection, null);
     }//GEN-LAST:event_barCopyButtonActionPerformed
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        // TODO add your handling code here:
+    private void barUndoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_barUndoButtonActionPerformed
         if(!past.isEmpty()){
             future.add( editorTextArea.getText() );
             editorTextArea.setText( past.remove(past.size()-1) );
         }
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    }//GEN-LAST:event_barUndoButtonActionPerformed
 
-    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-        // TODO add your handling code here:
-        System.out.println("Redo!");
+    private void barRedoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_barRedoButtonActionPerformed
         if (!future.isEmpty()) {
             past.add( editorTextArea.getText() );
             editorTextArea.setText( future.remove(future.size()-1));
         }
-    }//GEN-LAST:event_jMenuItem2ActionPerformed
+    }//GEN-LAST:event_barRedoButtonActionPerformed
 
     private void editorKeyPress(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_editorKeyPress
-        // TODO add your handling code here:
+        int keyCode = evt.getKeyCode();
         
-        if (!evt.isActionKey() && !evt.isControlDown()) {
+        if (keyCode == java.awt.event.KeyEvent.VK_TAB) {
+            int currentPosition = editorTextArea.getCaretPosition()-1;
+            String lastWord = "";
+            for(;currentPosition >= 0; currentPosition--){
+                char currentChar = editorTextArea.getText().charAt(currentPosition);
+                if ( currentChar != ' ' && currentChar != '\n')
+                    lastWord += currentChar;
+                else
+                    break;
+            }
+            lastWord = (new StringBuilder(lastWord)).reverse().toString();
+            if(shortcuts.containsKey(lastWord))
+                editorTextArea.insert(shortcuts.get(lastWord), editorTextArea.getCaretPosition());
+            
+        }else if (!evt.isActionKey()) {
             past.add( editorTextArea.getText() );
             future.removeAll(future);
         }
@@ -409,13 +433,13 @@ public class Editor extends javax.swing.JFrame {
     private javax.swing.JMenuItem barExitButton;
     private javax.swing.JMenu barFileMenu;
     private javax.swing.JMenuItem barOpenButton;
+    private javax.swing.JMenuItem barRedoButton;
     private javax.swing.JMenu barRunMenu;
     private javax.swing.JMenuItem barSaveButton;
+    private javax.swing.JMenuItem barUndoButton;
     private javax.swing.JLabel documentBar;
     private javax.swing.JScrollPane editorScroll;
     private javax.swing.JTextArea editorTextArea;
-    private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JLabel outputLabel;
     private javax.swing.JTextArea outputPane;

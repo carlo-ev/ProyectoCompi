@@ -12,7 +12,7 @@ import java.io.File;
 public class FlexCreator {
     
     public static void main(String[] args) {
-        jflex.Main.generate(new File ("src\\proyectocompi\\LenguajeCompi.flex"));
+        jflex.Main.generate(new File ("src\\proyectocompi\\TieFlex.flex"));
     }
     
 }

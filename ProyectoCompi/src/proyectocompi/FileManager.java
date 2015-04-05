@@ -107,6 +107,10 @@ public class FileManager {
         return content;
     }
     
+    public boolean isDefaultFile(){
+        return filePath.isEmpty();
+    }
+    
     public String getFilePath(){
         if (filePath.isEmpty()) {
             return "editorCode.tie";

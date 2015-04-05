@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import javax.swing.JTextArea;
 import java_cup.runtime.*;
 %%
-%class LenguajeCompi
+%class TieLexer
 %unicode
 %line
 %column
@@ -16,13 +16,13 @@ import java_cup.runtime.*;
 //Values
 digit = [0-9]+
 boolean = (true|false)
-character = '(.|\s)'
-string = " \"(.|\s|\t|\n)*\" "
+character = \'(.|\s)\'
+string = \"(.|\s|\t|\n)*\"
 float = {digit}(\.[0.-9]{1,2})?
 whitespace = [\s|\t\|\r|\n]+
 
 //Types and Assignment
-id = [a-zA-Z|_|@|#]+({digit}([a-zA-Z|_|@|#]+)?)*
+id = [a-zA-Z|_]+({digit}([a-zA-Z|_]+)?)*
 assign = (=)
 number = num
 binary = bin
@@ -47,12 +47,8 @@ setEnd = \/set
 option = opt
 any = any
 
-then = \>>
-
-
 til = til
 tilEnd = \/til
-//for the while cycle?
 
 //Functions Main
 main = run
@@ -61,9 +57,6 @@ act = act
 actEnd = \/act
 return = ret
 void = nil
-
-deusexmachina = deusExMachina
-deusexmachinaEnd = \/deusExMachina
 
 //Math Operators
 plus = \+
@@ -84,6 +77,7 @@ unEqual = (\!=)
 not = [not|!]
 
 //General Operators
+this = @
 dot = \.
 comma = \,
 commentStart = #\*
@@ -97,15 +91,15 @@ include = inc
 %state COMMENTS
 
 %{
-	public static JTextArea outputArea;
-	public static ArrayList<String> lexErrors = new ArrayList<String>();
+    public static JTextArea outputArea;
+    public static ArrayList<String> lexErrors = new ArrayList<String>();
 
-	public void printOutput(String outputLine){
-		if(outputArea != null){
-			outputArea.append(outputLine + "\n");
-		} 
-		lexErrors.add(outputLine);
-	}
+    public void printOutput(String outputLine){
+            if(outputArea != null){
+                    outputArea.append(outputLine + "\n");
+            } 
+            lexErrors.add(outputLine);
+    }
 %}
 
 %eofval{
@@ -137,7 +131,6 @@ include = inc
 	{set} 				{return new Symbol(sym.SET);}
 	{setEnd} 			{return new Symbol(sym.SETEND);}
 	{option} 			{return new Symbol(sym.OPT);}
-//	{then}				{return new Symbol(sym.THEN);}
 	{any}				{return new Symbol(sym.ANY);}
 
 	{til}				{return new Symbol(sym.TIL);}
@@ -149,9 +142,9 @@ include = inc
         {act} 				{return new Symbol(sym.ACT);}
 	{actEnd} 			{return new Symbol(sym.ACTEND);}
 	{return} 			{return new Symbol(sym.RET);}
-/*
+
 	{void} 				{return new Symbol(sym.NIL);}
-*/
+
 	{plus}				{return new Symbol(sym.PLUS);}
 	{minus}				{return new Symbol(sym.MINUS);}
 	{mult}				{return new Symbol(sym.MULT);}
@@ -167,9 +160,10 @@ include = inc
 	{equal}				{return new Symbol(sym.EQUAL);}
 	{unEqual}			{return new Symbol(sym.NOTEQUAL);}
 	{not}				{return new Symbol(sym.NOT);}
-/*
+
+        {this}                          {return new Symbol(sym.THIS);}
 	{dot}				{return new Symbol(sym.DOT);}
-*/
+
 	{comma}				{return new Symbol(sym.COMMA);}
         {parIzq}			{return new Symbol(sym.PARIZQ);}
 	{parDer}			{return new Symbol(sym.PARDER);}
@@ -187,10 +181,11 @@ include = inc
 	{float}				{return new Symbol( sym.FLOAT, new Float(yytext()) );}
 
 	{id}				{return new Symbol(sym.ID, yytext());}
-	{whitespace}		{}
+	{whitespace}                    {}
 	. 				{this.printOutput("> Unknown Token: '"+yytext()+"' in Line "+Integer.toString(yyline)+" Column "+Integer.toString(yycolumn) );}
 
 } 
 <COMMENTS>{
-	{commentEnd}|.|{whitespace}		{}
+	{commentEnd}            {yybegin(YYINITIAL);}
+        .|{whitespace}		{}
 }

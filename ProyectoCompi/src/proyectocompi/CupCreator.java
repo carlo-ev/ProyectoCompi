@@ -18,8 +18,8 @@ public class CupCreator {
         opciones[1] = "src\\ProyectoCompi\\";
         //Nombre Archivo
         opciones[2] = "-parser";
-        opciones[3] = "Analizador";
-        opciones[4] = "src\\ProyectoCompi\\analizador.cup";
+        opciones[3] = "TieParser";
+        opciones[4] = "src\\ProyectoCompi\\TieSyntax.cup";
         
         try{
             java_cup.Main.main(opciones);

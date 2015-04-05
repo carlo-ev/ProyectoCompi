@@ -1,0 +1,7 @@
+run
+
+str algo = "algo";
+
+sym algo = 'a';
+
+/run	
