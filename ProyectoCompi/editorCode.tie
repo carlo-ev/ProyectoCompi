@@ -1,7 +1,5 @@
 run
 
-str algo = "algo";
-
-sym algo = 'a';
+num numero = 12;
 
 /run	

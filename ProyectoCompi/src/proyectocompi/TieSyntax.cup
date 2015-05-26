@@ -8,6 +8,7 @@ import javax.swing.JTextArea;
 parser code
 {:
     
+    public TreeNode AST = new TreeNode();
     public JTextArea outputArea;
     public  int errors = 0;
     
@@ -44,179 +45,270 @@ parser code
 :}
 
 
-//TERMINALES
+// TERMINALES
 
-// Tipos
-terminal NUM, BIN, DEC, SYM, STR;
+//Tipos
+    terminal NUM, BIN, DEC, SYM, STR;
 
 // Valores Con sus Java Types
-terminal java.lang.Boolean BOOL;
-terminal java.lang.Number DIGIT;
-terminal java.lang.Number FLOAT;
-terminal java.lang.Character CHAR;
-terminal java.lang.String STRING;
-terminal java.lang.String ID;
+    terminal Boolean BOOL;
+    terminal Integer DIGIT;
+    terminal Float FLOAT;
+    terminal Character CHAR;
+    terminal String STRING;
+    terminal String ID;
 
 // Statements
-terminal END, ASSIGN;
-non terminal ID_FUNC_S, STATEMENT_ID_FUNC_S, STATEMENT_ID_FUNC_A;
+    terminal END, ASSIGN;
+    non terminal LISTA_IDS, DECLARE_VARIABLE;
 
-// Ciclo FOR
-terminal REP, REPEND, OUT;
-non terminal FOR_S, FOR_A, FOR_B;
+// _FOR
+    terminal REP, REPEND;
+    non terminal _FOR, FOR_ASSIGN;
 
-// IF
-terminal COND, CONDEND, YET, YETEND;
-non terminal IF_S, IF_A;
+// _IF
+    terminal COND, CONDEND, YET, YETEND;
+    non terminal _IF, _ELSE;
 
 
-// SWITCH 
-terminal SET, SETEND, OPT, ANY;
-non terminal SWITCH_S, SWITCH_A, SWITCH_B, SWITCH_C, SWITCH_TYPES;
+// _SWITCH 
+    terminal SET, SETEND, OPT, OPTEND, ANY, ANYEND;
+    non terminal SWITCH_LITERALS, DEFAULT, CASE, _SWITCH;
 
-// WHILE
-terminal TIL, TILEND;
-non terminal WHILE_S, WHILE_A;
+// _WHILE
+    terminal TIL, TILEND;
+    non terminal _WHILE;
+
+//FUNCTIONS
+    non terminal PARAMS, CALL_FUNCTION, PARAM, RETURN, ARGUMENT, ARGUMENTS, FUNCTION_TYPES, DECLARE_FUNCTION;
 
 // Main & Funciones
-terminal MAIN, MAINEND, ACT, ACTEND, RET, NIL;
-non terminal FUNC_S, FUNC_A, FUNC_B, FUNC_C, FUNC_TYPES, FUNC_EXEC_S, FUNC_EXEC_A, FUNC_EXEC_B;
+    terminal MAIN, MAINEND, ACT, ACTEND, RET, NIL;
 
 // Operadores 
-terminal PLUS, MINUS, MULT, DIV, MOD, DOT;
+    terminal PLUS, MINUS, MULT, DIV, MOD;
 
 // Operadores Logicos
-terminal AND, OR, LESSTHAN, GREATERTHAN, GREATEREQUALTHAN, LESSEQUALTHAN, EQUAL, NOTEQUAL, NOT;
+    non terminal BooleanTypes;
+    terminal AND, OR, LESSTHAN, GREATERTHAN, GREATEREQUALTHAN, LESSEQUALTHAN, EQUAL, NOTEQUAL, NOT;
 
 // Fillers
-terminal PARIZQ, PARDER, COMMA, THIS;//, BRAIZQ, BRADER, INCLUDE;
+    terminal PARIZQ, PARDER, COMMA;
 
 //NO TEMRINALES
-non terminal PROGRAM, PROGRAM_BODY;
+    non terminal PROGRAM, PROGRAM_BODY;
 
 
 //Sept No Terminales
-non terminal DECLARE_S, DECLARE_A, DECLARE_B, DECLARE_FOR, TYPES, LITERALS, E, T, F;
-non terminal LogicalOperators, Concat, Negation, LogicalA, LogicalB;
-non terminal ELogical, TLogical, FLogical;
+    non terminal TYPES, LITERALS, E, T, F;
+    non terminal LogicalOperators, Concat, Negation, LogicalA, LogicalB;
+    non terminal ELogical, TLogical, FLogical;
 
-non terminal STATEMENT, STATEMENTS;
+    non terminal STATEMENT, STATEMENTS;
 
 start with PROGRAM;
 
-TYPES ::= NUM | DEC | BIN | SYM | STR;
-LITERALS ::= BOOL:bl | DIGIT:dt | FLOAT:ft | CHAR:chr | STRING:str | ID:id ID_FUNC_S;
-Concat ::= AND | OR;
-Negation ::= NOT | ;
-LogicalOperators ::= LESSTHAN | GREATERTHAN | LESSEQUALTHAN | GREATEREQUALTHAN | EQUAL | NOTEQUAL;
+TYPES ::= NUM:num                                                               {: RESULT = new TreeNode(num); :}
+    | DEC:dec                                                                   {: RESULT = new TreeNode(dec); :}
+    | BIN:bin                                                                   {: RESULT = new TreeNode(bin); :}
+    | SYM:sym                                                                   {: RESULT = new TreeNode("sym"); :}
+    | STR:str                                                                   {: RESULT = new TreeNode("str"); :}
+    ;
 
-//Right Side ID or Function Execution Disambiguation
-ID_FUNC_S ::= FUNC_EXEC_S | ;
-//End Right Side ID or Function
+LITERALS ::= BOOL:bl                                                            {: RESULT = new TreeNode( Boolean.toString(bl) ); :} 
+           | DIGIT:dt                                                           {: RESULT = new TreeNode( Integer.toString(dt) ); :}
+           | FLOAT:ft                                                           {: RESULT = new TreeNode( Float.toString(ft) ); :}
+           | CHAR:chr                                                           {: RESULT = new TreeNode( Character.toString(chr) ); :}
+           | STRING:str                                                         {: RESULT = new TreeNode(str); :}
+           | ID:id                                                              {: RESULT = new TreeNode(id.toString()); :}
+           | ID:id PARIZQ PARAMS:p PARDER                                       {: RESULT = new TreeNode(id.toString(), p); :}
+           ;
 
-//Statement ID or Function Disambiguation
-STATEMENT_ID_FUNC_S ::= ID:id STATEMENT_ID_FUNC_A;
-STATEMENT_ID_FUNC_A ::= FUNC_EXEC_S END | ASSIGN E END;
-//Statement ID or Function End
+Concat ::= AND:and                                                              {: RESULT = new TreeNode(and.toString()); :} 
+         | OR:or                                                                {: RESULT = new TreeNode(or.toString()); :}
+         ;
 
-//DECLARACIONES
-DECLARE_B ::= ID:id COMMA DECLARE_B 
-        | ID:id END;
-DECLARE_A ::= ID:id ASSIGN E END;
-DECLARE_S ::= TYPES DECLARE_A 
-        | TYPES DECLARE_B;
-//DECLARACIONES END
+Negation ::= NOT:not                                                            {: RESULT = true; :} 
+    |                                                                           {: RESULT = false; :}
+    ;
 
-//DECLARACION PARA EL FOR
-DECLARE_FOR ::= TYPES ID:id ASSIGN E;
-//CASO ESPECIAL
-
-//ARIT OPERATION
-F ::= LITERALS 
-    | PARIZQ E PARDER;
-T ::= T MULT F 
-    | T DIV F 
-    | T MOD F 
-    | F;
-E ::= E PLUS T 
-    | E MINUS T 
-    | T;
-//ARIT OPERATION END
+LogicalOperators ::= LESSTHAN:lt                                                {: RESULT = lt; :}
+    | GREATERTHAN:gt                                                            {: RESULT = gt; :} 
+    | LESSEQUALTHAN:let                                                         {: RESULT = let; :}
+    | GREATEREQUALTHAN:get                                                      {: RESULT = get; :}
+    | EQUAL:e                                                                   {: RESULT = e; :}
+    | NOTEQUAL:ne                                                               {: RESULT = ne; :}
+    ;
 
 
-//Logical Operations
-LogicalB ::= ELogical LogicalOperators LogicalB 
-            | ELogical;
-LogicalA ::= LogicalA Concat LogicalB 
-            | LogicalB;
+//----------- ARIT OPERATION
+F ::= LITERALS:li                                                               {: RESULT = li; :}
+    | PARIZQ E:e PARDER                                                         {: RESULT = e; :};
+T ::= T:t MULT:m F:f                                                            {: RESULT = new TreeNode(m.toString(),t,f); :}
+    | T:t DIV:d F:f                                                             {: RESULT = new TreeNode(d.toString(),t,f); :}
+    | T:t MOD:m F:f                                                             {: RESULT = new TreeNode(m.toString(),t,f); :}
+    | F:f                                                                       {: RESULT = f; :}
+    ;
+E ::= E:e PLUS:p T:t                                                            {: RESULT = new TreeNode(p.toString(),e,t); :}
+    | E:e MINUS:m T:t                                                           {: RESULT = new TreeNode(m.toString(),e,t); :}
+    | T:t                                                                       {: RESULT = t; :}
+    ;
 
-//Arithmetic Operations for Logical Statements.
-FLogical ::= Negation LITERALS
-        | Negation PARIZQ LogicalA PARDER;
-TLogical ::= TLogical MULT FLogical 
-        | TLogical DIV FLogical 
-        | TLogical MOD FLogical 
-        | FLogical;
-ELogical ::= ELogical PLUS TLogical 
-        | ELogical MINUS TLogical 
-        | TLogical;
+//----------- ARIT OPERATION END
 
-//FUNCTION DECLARATION
 
-FUNC_C ::= RET LITERALS END | ;
-FUNC_B ::= COMMA FUNC_A | ;
-FUNC_A ::= TYPES ID:id FUNC_B; 
-FUNC_TYPES ::= TYPES | NIL;
-FUNC_S ::= FUNC_TYPES ACT ID:id PARIZQ FUNC_A PARDER PROGRAM_BODY FUNC_C ACTEND;
-//FUNCTION DECLARTION END
+//----------- Logical Operations
 
-//FUNCTION EXECUTION
-FUNC_EXEC_B ::= COMMA FUNC_EXEC_A | ;
-FUNC_EXEC_A ::= ID:id FUNC_EXEC_B | ;
-FUNC_EXEC_S ::= DOT ID:id PARIZQ FUNC_EXEC_A PARDER 
-            | PARIZQ FUNC_EXEC_A PARDER;
-//FUNCTION EXECUTION END
+LogicalB ::= ELogical:el LogicalOperators:op LogicalB:lb                        {: RESULT = new TreeNode(op.toString(), el, lb); :}
+        | ELogical:el                                                           {: RESULT = el; :}
+        ;
+LogicalA ::= LogicalA:al Concat:concat LogicalB:lb                              {: RESULT = new TreeNode(concat.toString(), al, lb); :} 
+        | LogicalB:lb                                                           {: RESULT = lb; :}
+        ;
 
-//IF 
-IF_A ::= PROGRAM_BODY CONDEND YET PROGRAM_BODY YETEND 
-    | PROGRAM_BODY CONDEND;
-IF_S ::= COND PARIZQ LogicalA PARDER IF_A;
-// IF END
+//----------- Logical Operations END
 
-//FOR 
-FOR_B ::= PROGRAM_BODY REPEND | PROGRAM_BODY OUT END REPEND;
-FOR_A ::= PARIZQ DECLARE_S LogicalA END DECLARE_FOR PARDER FOR_B;
-FOR_S ::= REP FOR_A; 
-//FOR END
 
-//WHILE
-    WHILE_A ::= TILEND | OUT END TILEND;
-    WHILE_S ::= TIL PARIZQ LogicalA PARDER PROGRAM_BODY WHILE_A ;
-//WHILE END
+//----------- Arithmetic Operations for Logical Statements
 
-//SWITCH 
-    SWITCH_TYPES ::= CHAR:ch | DIGIT:dt | ID:id;
-    SWITCH_C ::= OUT END | ;
-    SWITCH_B ::= SWITCH_B OPT PARIZQ SWITCH_TYPES PARDER PROGRAM_BODY SWITCH_C ;
-    SWITCH_A ::= SWITCH_B ANY PROGRAM_BODY SWITCH_C SWITCH_B 
-        | SWITCH_B;
-    SWITCH_S ::= SET PARIZQ SWITCH_TYPES PARDER SWITCH_A SETEND;
-//SWITCH END
+BooleanTypes ::= BOOL:bl                                                        {: RESULT = new TreeNode( Boolean.toString(bl) ); :}
+        | ID:id                                                                 {: RESULT = new TreeNode(id.toString()); :}
+        | ID:id PARIZQ PARAMS:p PARDER                                          {: RESULT = new TreeNode(id.toString(), p); :}
+        ;
+FLogical ::= Negation:n BooleanTypes:lit                                        {: if((Boolean)n){ RESULT = new TreeNode("!", lit); }else{ RESULT = lit; } :}
+        | Negation:n PARIZQ LogicalA:la PARDER                                  {: if((Boolean)n){ RESULT = new TreeNode("!", la); }else{ RESULT = la; } :}
+        ;
+TLogical ::= TLogical:tl MULT:m FLogical:fl                                     {: RESULT = new TreeNode(m.toString(), tl, fl); :}
+        | TLogical:tl DIV:d FLogical:fl                                         {: RESULT = new TreeNode(d.toString(), tl, fl); :}
+        | TLogical:tl MOD:m FLogical:fl                                         {: RESULT = new TreeNode(m.toString(), tl, fl); :}
+        | FLogical:fl                                                           {: RESULT = fl; :}
+        ;
+ELogical ::= ELogical:el PLUS:p TLogical:tl                                     {: RESULT = new TreeNode(p.toString(), el, tl); :} 
+        | ELogical:fl MINUS:m TLogical:tl                                       {: RESULT = new TreeNode(m.toString(), fl, tl); :}
+        | TLogical:tl                                                           {: RESULT = tl; :}
+        ;
 
-STATEMENTS ::= STATEMENTS STATEMENT
-            | STATEMENT
-            | error {: parser.report_error("Error in a Statement", ""); :}; 
+//----------- Arithmetic Operations for Logical Statements END
 
-STATEMENT ::= DECLARE_S
-            | IF_S
-            | FOR_S
-            | WHILE_S 
-            | SWITCH_S
-            | FUNC_S
-            | STATEMENT_ID_FUNC_S;
 
-PROGRAM_BODY ::= STATEMENTS | ;
+//----------- Statement ID or Function Disambiguation
 
-PROGRAM ::= MAIN PROGRAM_BODY MAINEND
-        | error PROGRAM_BODY MAINEND {: parser.report_error("RUN END without RUN", ""); :}
-        | MAIN error {: parser.report_error("Error Reaching RUN END", ""); :};
+CALL_FUNCTION ::= ID:id PARIZQ PARAMS:p PARDER END                               {: RESULT = new TreeNode(id.toString(), p); :}
+    | ID:id ASSIGN:a E:e END                                                    {: RESULT = new TreeNode(a.toString(), new TreeNode(id.toString()), e); :};
+
+//----------- Statement ID or Function End
+
+
+//----------- FUNCTION PARAM LIST
+
+    PARAM ::= PARAMS:p COMMA:c ID:id                                            {: ((TreeNode)p).addChild(new TreeNode(id.toString())); RESULT = p; :} 
+        | ID:id                                                                 {: RESULT = new TreeNode("Params", new TreeNode(id.toString())); :};
+    PARAMS ::= PARAM:p                                                          {: RESULT = p; :}
+        |                                                                       {: RESULT = new TreeNode(""); :};
+
+//----------- FUNCTION PARAM LIST END
+
+
+//----------- FUNCTION DECLARATION
+
+RETURN ::= RET:ret LITERALS:lit END                                             {: RESULT = new TreeNode(ret.toString(), lit); :}
+    |                                                                           {: RESULT = new TreeNode(""); :}
+    ;
+ARGUMENT ::= ARGUMENT:arg COMMA TYPES:t ID:id                                   {: ((TreeNode)arg).addChild( new TreeNode(id.toString(), t.toString()) ); RESULT = arg; :}
+    | TYPES:t ID:id                                                             {: RESULT = new TreeNode("Arguments", new TreeNode(id.toString(), t.toString()) ); :}
+    ;
+ARGUMENTS ::= ARGUMENT:args                                                     {: RESULT = args; :}
+    |                                                                           {: RESULT = new TreeNode(""); :}
+    ;
+FUNCTION_TYPES ::= TYPES:t                                                      {: RESULT = t; :} 
+    | NIL:nil                                                                   {: RESULT = new TreeNode(nil.toString()); :}
+    ;
+DECLARE_FUNCTION ::= FUNCTION_TYPES:t ACT:act ID:id PARIZQ ARGUMENTS:args PARDER PROGRAM_BODY:body RETURN:r ACTEND {: RESULT = new TreeNode(act.toString(), t.toString(), new TreeNode(id.toString()), args, body, r); :}
+    ;
+
+//----------- FUNCTION DECLARATION END
+
+
+//----------- _WHILE
+
+    _WHILE ::= TIL:til PARIZQ LogicalA:la PARDER PROGRAM_BODY:body TILEND        {: RESULT = new TreeNode(til.toString(), la, body); :}
+        ;
+
+//----------- _WHILE END
+
+
+//----------- _SWITCH 
+
+    SWITCH_LITERALS ::= CHAR:ch                                                 {: RESULT = new TreeNode(Character.toString(ch) ); :}
+        | DIGIT:dt                                                              {: RESULT = new TreeNode(Integer.toString(dt) ); :}
+        | ID:id                                                                 {: RESULT = new TreeNode(id.toString()); :}
+        ;
+    DEFAULT ::= ANY:any PROGRAM_BODY:body ANYEND                                {: RESULT = new TreeNode(any.toString(), body); :}
+        |                                                                       {: RESULT = new TreeNode(""); :}
+        ;
+    CASE ::= CASE:c OPT:opt PARIZQ SWITCH_LITERALS:sl PARDER PROGRAM_BODY:b OPTEND  {: ((TreeNode)c).addChild( new TreeNode(opt.toString(), sl, b) ); RESULT = c; :}
+        |                                                                       {:RESULT = new TreeNode("CASES"); :}
+        ;
+    _SWITCH ::= SET:set PARIZQ SWITCH_LITERALS:sl PARDER CASE:c DEFAULT:d SETEND {: RESULT = new TreeNode(set.toString(), sl, c, d); :};
+
+//----------- _SWITCH END
+
+
+//----------- _FOR
+
+FOR_ASSIGN ::= ID:id ASSIGN:a E:e                                               {: RESULT = new TreeNode(a.toString(), new TreeNode(id.toString()), e); :}
+    |                                                                           {: RESULT = new TreeNode(""); :}                             
+    ;
+_FOR ::= REP:rep PARIZQ FOR_ASSIGN:fa END LogicalA:la END FOR_ASSIGN:fa2 PARDER PROGRAM_BODY:body REPEND {: RESULT = new TreeNode(rep.toString(), fa, la, fa2, body); :}
+    ; 
+
+//----------- _FOR END
+
+
+//----------- _IF _ELSE
+
+_ELSE ::= YET:yet PROGRAM_BODY:body YETEND                                       {: RESULT = new TreeNode(yet.toString(), body); :}
+    |                                                                           {: RESULT = new TreeNode(""); :}
+    ;
+_IF ::= COND:cond PARIZQ LogicalA:la PARDER PROGRAM_BODY CONDEND _ELSE:_else       {: RESULT = new TreeNode(cond.toString(), la, _else); :}
+    ;
+
+//----------- _IF _ELSE END
+
+
+//----------- DECLARACIONES
+
+LISTA_IDS ::= LISTA_IDS:li COMMA ID:id                                          {: ((TreeNode)li).addChild(new TreeNode(id.toString())); RESULT = li; :}
+    |   TYPES:type ID:id END                                                    {: RESULT = new TreeNode("Declare ID", type.toString(), new TreeNode(id.toString()) ); :}
+    ;
+DECLARE_VARIABLE ::= TYPES:type ID:id ASSIGN:a E:e END                          {: RESULT = new TreeNode("Declare ID", type.toString(), new TreeNode(a.toString(), new TreeNode(id.toString()) , e) ); :}
+    | LISTA_IDS:li                                                              {: RESULT = li; :}
+    ;
+
+//----------- DECLARACIONES END
+
+
+//----------- PROGRAM BEGINNING
+
+STATEMENT ::= DECLARE_VARIABLE:declare                                          {: RESULT = declare; :}
+            | _IF:_if                                                             {: RESULT = _if; :}
+            | _FOR:_for                                                           {: RESULT = _for; :}
+            | _WHILE:_while                                                      {: RESULT = _while; :}
+            | _SWITCH:_switch                                                     {: RESULT = _switch; :}
+            | DECLARE_FUNCTION:function                                         {: RESULT = function; :}
+            | CALL_FUNCTION:callfunction                                         {: RESULT = callfunction; :}
+            ;
+
+STATEMENTS ::= STATEMENTS:statements STATEMENT:statement                        {: ((TreeNode)statements).addChild(statement); RESULT = statements; :}
+            | STATEMENT:statement                                               {: RESULT = new TreeNode("Statements", statement); :}
+            | error                                                             {: parser.report_error("Error in a Statement", ""); :}
+            ; 
+
+PROGRAM_BODY ::= STATEMENTS:statements                                          {: RESULT = statements; :}
+            |                                                                   {: RESULT = new TreeNode(""); :}
+            ;
+
+PROGRAM ::= MAIN:main PROGRAM_BODY:body MAINEND                                 {: parser.AST = new TreeNode(main.toString(), body); :}
+        | error PROGRAM_BODY MAINEND                                            {: parser.report_error("RUN END without RUN", ""); :}
+        | MAIN error                                                            {: parser.report_error("Error Reaching RUN END", ""); :}
+        ;

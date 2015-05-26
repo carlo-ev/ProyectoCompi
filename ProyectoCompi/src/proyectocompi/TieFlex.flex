@@ -35,7 +35,6 @@ terminal = \;
 //Flow Operators
 repetition = rep
 repetitionEnd = \/rep
-out = out
 
 condition = con
 conditionEnd = \/con
@@ -45,7 +44,9 @@ yetend = \/yet
 set = set
 setEnd = \/set
 option = opt
+optionEnd = \/opt
 any = any
+anyEnd = \/any
 
 til = til
 tilEnd = \/til
@@ -100,6 +101,12 @@ include = inc
             } 
             lexErrors.add(outputLine);
     }
+    public Symbol symbol(int type){
+        return new Token(type, yyline+1, yycolumn+1, yytext());
+    }
+    public Symbol symbol(int type, Object value){
+        return new Token(type, yyline+1, yycolumn+1, yytext(), value);
+    }
 %}
 
 %eofval{
@@ -121,7 +128,6 @@ include = inc
 
 	{repetition}                    {return new Symbol(sym.REP);}
 	{repetitionEnd}                 {return new Symbol(sym.REPEND);}
-	{out} 				{return new Symbol(sym.OUT);}
 
 	{condition}                     {return new Symbol(sym.COND);}
 	{conditionEnd}                  {return new Symbol(sym.CONDEND);}
@@ -160,27 +166,22 @@ include = inc
 	{equal}				{return new Symbol(sym.EQUAL);}
 	{unEqual}			{return new Symbol(sym.NOTEQUAL);}
 	{not}				{return new Symbol(sym.NOT);}
-
+/*
         {this}                          {return new Symbol(sym.THIS);}
-	{dot}				{return new Symbol(sym.DOT);}
-
+*/
 	{comma}				{return new Symbol(sym.COMMA);}
         {parIzq}			{return new Symbol(sym.PARIZQ);}
 	{parDer}			{return new Symbol(sym.PARDER);}
 
 	{commentStart}                  {yybegin(COMMENTS);}
-/*
-        {braketIzq}			{return new Symbol(sym.BRAIZQ);}
-	{braketDer}			{return new Symbol(sym.BRADER);}
-	{include}			{return new Symbol(sym.INCLUDE);}
-*/
-	{digit}				{return new Symbol( sym.DIGIT, Integer.parseInt(yytext()) );}
+
+	{digit}				{return new Symbol( sym.DIGIT, new Integer(yytext()) );}
 	{boolean}			{return new Symbol( sym.BOOL, new Boolean(yytext()) );}
 	{string}			{return new Symbol( sym.STRING, new String(yytext()) );}
-	{character}			{return new Symbol( sym.CHAR, yytext().charAt(0) );}
-	{float}				{return new Symbol( sym.FLOAT, new Float(yytext()) );}
+	{character}			{return new Symbol( sym.CHAR, new Character(yytext().charAt(0)) );}
+	{float}				{return new Symbol( sym.FLOAT, new Double(yytext()) );}
 
-	{id}				{return new Symbol(sym.ID, yytext());}
+	{id}				{return new Symbol(sym.ID);}
 	{whitespace}                    {}
 	. 				{this.printOutput("> Unknown Token: '"+yytext()+"' in Line "+Integer.toString(yyline)+" Column "+Integer.toString(yycolumn) );}
 

@@ -359,7 +359,8 @@ public class Editor extends javax.swing.JFrame {
                 this.outputPane.append("> Successful Code Parsing! < \n");
             }
         }catch(Exception ex){
-            System.out.println("Parser Crashed Unexpectedly");
+            System.out.println("Parser Crashed Unexpectedly"+ ex.toString() );
+            ex.printStackTrace();
         }
     }//GEN-LAST:event_barCheckButtonActionPerformed
 
