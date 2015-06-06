@@ -5,8 +5,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import javax.swing.JTextArea;
 
-parser code
-{:
+parser code {:
     
     public TreeNode AST = new TreeNode();
     public JTextArea outputArea;
@@ -19,24 +18,24 @@ parser code
 
     @Override
     public void report_error(String message, Object info) {
-    if (info instanceof String){
-	errors++; 
-        outputArea.append("("+errors+")> " + message + info + "\n");
+        if (info instanceof String){
+            errors++; 
+            outputArea.append("("+errors+")> " + message + info + "\n");
+        }
+        else {
+            StringBuffer m = new StringBuffer("Error ");
+            if (info instanceof java_cup.runtime.Symbol) 
+               m.append( "("+info.toString()+")" );     
+            m.append(" : "+message);   
+            System.err.println(m);
+        }
     }
-    else {
-    	StringBuffer m = new StringBuffer("Error ");
-    	if (info instanceof java_cup.runtime.Symbol) 
-     	   m.append( "("+info.toString()+")" );     
-    	m.append(" : "+message);   
-    	System.err.println(m);
-    }
-  }
    
-  @Override
-  public void report_fatal_error(String message, Object info) {
-    report_error(message, info);
-    throw new RuntimeException("Fatal Syntax Error");
-  }
+    @Override
+    public void report_fatal_error(String message, Object info) {
+      report_error(message, info);
+      throw new RuntimeException("Fatal Syntax Error");
+    }
 
     public void setOutput(JTextArea out){
         this.outputArea = out;
@@ -45,12 +44,8 @@ parser code
 :}
 
 
-// TERMINALES
+//----------- TERMINALES
 
-//Tipos
-    terminal NUM, BIN, DEC, SYM, STR;
-
-// Valores Con sus Java Types
     terminal Boolean BOOL;
     terminal Integer DIGIT;
     terminal Float FLOAT;
@@ -58,111 +53,92 @@ parser code
     terminal String STRING;
     terminal String ID;
 
-// Statements
+    terminal NUM, BIN, DEC, SYM, STR;
     terminal END, ASSIGN;
-    non terminal LISTA_IDS, DECLARE_VARIABLE;
-
-// _FOR
     terminal REP, REPEND;
-    non terminal _FOR, FOR_ASSIGN;
-
-// _IF
     terminal COND, CONDEND, YET, YETEND;
-    non terminal _IF, _ELSE;
-
-
-// _SWITCH 
     terminal SET, SETEND, OPT, OPTEND, ANY, ANYEND;
-    non terminal SWITCH_LITERALS, DEFAULT, CASE, _SWITCH;
-
-// _WHILE
     terminal TIL, TILEND;
-    non terminal _WHILE;
-
-//FUNCTIONS
-    non terminal PARAMS, CALL_FUNCTION, PARAM, RETURN, ARGUMENT, ARGUMENTS, FUNCTION_TYPES, DECLARE_FUNCTION;
-
-// Main & Funciones
     terminal MAIN, MAINEND, ACT, ACTEND, RET, NIL;
-
-// Operadores 
     terminal PLUS, MINUS, MULT, DIV, MOD;
-
-// Operadores Logicos
-    non terminal BooleanTypes;
     terminal AND, OR, LESSTHAN, GREATERTHAN, GREATEREQUALTHAN, LESSEQUALTHAN, EQUAL, NOTEQUAL, NOT;
-
-// Fillers
     terminal PARIZQ, PARDER, COMMA;
 
-//NO TEMRINALES
-    non terminal PROGRAM, PROGRAM_BODY;
+//----------- NO TEMRINALES
 
+    non terminal TreeNode BooleanTypes;
+    non terminal TreeNode SWITCH_LITERALS, DEFAULT, CASE, _SWITCH;
+    non terminal TreeNode _IF, _ELSE;
+    non terminal TreeNode LISTA_IDS, DECLARE_VARIABLE;
+    non terminal TreeNode PROGRAM, PROGRAM_BODY;
+    non terminal TreeNode _WHILE;
+    non terminal TreeNode LITERALS, E, T, F;
+    non terminal TreeNode LogicalA, LogicalB;
+    non terminal String LogicalOperators, Concat, TYPES, FUNCTION_TYPES;
+    non terminal TreeNode ELogical, TLogical, FLogical;
+    non terminal Boolean Negation;
+    non terminal TreeNode STATEMENT, STATEMENTS;
+    non terminal TreeNode _FOR, FOR_ASSIGN;
+    non terminal TreeNode PARAMS, CALL_FUNCTION, PARAM, RETURN, ARGUMENT, ARGUMENTS, DECLARE_FUNCTION;
 
-//Sept No Terminales
-    non terminal TYPES, LITERALS, E, T, F;
-    non terminal LogicalOperators, Concat, Negation, LogicalA, LogicalB;
-    non terminal ELogical, TLogical, FLogical;
-
-    non terminal STATEMENT, STATEMENTS;
 
 start with PROGRAM;
 
-TYPES ::= NUM:num                                                               {: RESULT = new TreeNode(num); :}
-    | DEC:dec                                                                   {: RESULT = new TreeNode(dec); :}
-    | BIN:bin                                                                   {: RESULT = new TreeNode(bin); :}
-    | SYM:sym                                                                   {: RESULT = new TreeNode("sym"); :}
-    | STR:str                                                                   {: RESULT = new TreeNode("str"); :}
-    ;
+    TYPES ::= NUM:num                                                           {: RESULT = "num"; :}
+        | DEC:dec                                                               {: RESULT = "dec"; :}
+        | BIN:bin                                                               {: RESULT = "bin"; :}
+        | SYM:sym                                                               {: RESULT = "sym"; :}
+        | STR:str                                                               {: RESULT = "str"; :}
+        ;
 
-LITERALS ::= BOOL:bl                                                            {: RESULT = new TreeNode( Boolean.toString(bl) ); :} 
-           | DIGIT:dt                                                           {: RESULT = new TreeNode( Integer.toString(dt) ); :}
-           | FLOAT:ft                                                           {: RESULT = new TreeNode( Float.toString(ft) ); :}
-           | CHAR:chr                                                           {: RESULT = new TreeNode( Character.toString(chr) ); :}
-           | STRING:str                                                         {: RESULT = new TreeNode(str); :}
-           | ID:id                                                              {: RESULT = new TreeNode(id.toString()); :}
-           | ID:id PARIZQ PARAMS:p PARDER                                       {: RESULT = new TreeNode(id.toString(), p); :}
-           ;
+    LITERALS ::= BOOL:bl                                                        {: RESULT = new TreeNode( Boolean.toString(bl) ); :} 
+        | DIGIT:dt                                                              {: RESULT = new TreeNode( Integer.toString(dt) ); :}
+        | FLOAT:ft                                                              {: RESULT = new TreeNode( Float.toString(ft) ); :}
+        | CHAR:chr                                                              {: RESULT = new TreeNode( Character.toString(chr) ); :}
+        | STRING:str                                                            {: RESULT = new TreeNode(str); :}
+        | ID:id                                                                 {: RESULT = new TreeNode(id); :}
+        | ID:id PARIZQ PARAMS:p PARDER                                          {: RESULT = new TreeNode(id, p); :}
+        ;
 
-Concat ::= AND:and                                                              {: RESULT = new TreeNode(and.toString()); :} 
-         | OR:or                                                                {: RESULT = new TreeNode(or.toString()); :}
-         ;
+    Concat ::= AND:and                                                          {: RESULT = "and"; :} 
+        | OR:or                                                                 {: RESULT = "or"; :}
+        ;
 
-Negation ::= NOT:not                                                            {: RESULT = true; :} 
-    |                                                                           {: RESULT = false; :}
-    ;
+    Negation ::= NOT:not                                                        {: RESULT = true; :} 
+        |                                                                       {: RESULT = false; :}
+        ;
 
-LogicalOperators ::= LESSTHAN:lt                                                {: RESULT = lt; :}
-    | GREATERTHAN:gt                                                            {: RESULT = gt; :} 
-    | LESSEQUALTHAN:let                                                         {: RESULT = let; :}
-    | GREATEREQUALTHAN:get                                                      {: RESULT = get; :}
-    | EQUAL:e                                                                   {: RESULT = e; :}
-    | NOTEQUAL:ne                                                               {: RESULT = ne; :}
-    ;
+    LogicalOperators ::= LESSTHAN:lt                                            {: RESULT = "<"; :}
+        | GREATERTHAN:gt                                                        {: RESULT = ">"; :} 
+        | LESSEQUALTHAN:let                                                     {: RESULT = "<="; :}
+        | GREATEREQUALTHAN:get                                                  {: RESULT = ">="; :}
+        | EQUAL:e                                                               {: RESULT = "="; :}
+        | NOTEQUAL:ne                                                           {: RESULT = "!="; :}
+        ;
 
 
 //----------- ARIT OPERATION
-F ::= LITERALS:li                                                               {: RESULT = li; :}
-    | PARIZQ E:e PARDER                                                         {: RESULT = e; :};
-T ::= T:t MULT:m F:f                                                            {: RESULT = new TreeNode(m.toString(),t,f); :}
-    | T:t DIV:d F:f                                                             {: RESULT = new TreeNode(d.toString(),t,f); :}
-    | T:t MOD:m F:f                                                             {: RESULT = new TreeNode(m.toString(),t,f); :}
-    | F:f                                                                       {: RESULT = f; :}
-    ;
-E ::= E:e PLUS:p T:t                                                            {: RESULT = new TreeNode(p.toString(),e,t); :}
-    | E:e MINUS:m T:t                                                           {: RESULT = new TreeNode(m.toString(),e,t); :}
-    | T:t                                                                       {: RESULT = t; :}
-    ;
+    F ::= LITERALS:li                                                           {: RESULT = li; :}
+        | PARIZQ E:e PARDER                                                     {: RESULT = e; :};
+    T ::= T:t MULT:m F:f                                                        {: RESULT = new TreeNode("*",t,f); :}
+        | T:t DIV:d F:f                                                         {: RESULT = new TreeNode("/",t,f); :}
+        | T:t MOD:m F:f                                                         {: RESULT = new TreeNode("%",t,f); :}
+        | F:f                                                                   {: RESULT = f; :}
+        ;
+    E ::= E:e PLUS:p T:t                                                        {: RESULT = new TreeNode("+",e,t); :}
+        | E:e MINUS:m T:t                                                       {: RESULT = new TreeNode("-",e,t); :}
+        | T:t                                                                   {: RESULT = t; :}
+        ;
 
 //----------- ARIT OPERATION END
 
 
 //----------- Logical Operations
 
-LogicalB ::= ELogical:el LogicalOperators:op LogicalB:lb                        {: RESULT = new TreeNode(op.toString(), el, lb); :}
+    LogicalB ::= ELogical:el LogicalOperators:op LogicalB:lb                    {: RESULT = new TreeNode(op ,el, lb); :}
         | ELogical:el                                                           {: RESULT = el; :}
         ;
-LogicalA ::= LogicalA:al Concat:concat LogicalB:lb                              {: RESULT = new TreeNode(concat.toString(), al, lb); :} 
+    LogicalA ::= LogicalA:al Concat:concat LogicalB:lb                          {: RESULT = new TreeNode(concat, al, lb); :} 
         | LogicalB:lb                                                           {: RESULT = lb; :}
         ;
 
@@ -171,20 +147,20 @@ LogicalA ::= LogicalA:al Concat:concat LogicalB:lb                              
 
 //----------- Arithmetic Operations for Logical Statements
 
-BooleanTypes ::= BOOL:bl                                                        {: RESULT = new TreeNode( Boolean.toString(bl) ); :}
-        | ID:id                                                                 {: RESULT = new TreeNode(id.toString()); :}
-        | ID:id PARIZQ PARAMS:p PARDER                                          {: RESULT = new TreeNode(id.toString(), p); :}
+    BooleanTypes ::= BOOL:bl                                                    {: RESULT = new TreeNode( Boolean.toString(bl) ); :}
+        | ID:id                                                                 {: RESULT = new TreeNode(id); :}
+        | ID:id PARIZQ PARAMS:p PARDER                                          {: RESULT = new TreeNode(id, p); :}
         ;
-FLogical ::= Negation:n BooleanTypes:lit                                        {: if((Boolean)n){ RESULT = new TreeNode("!", lit); }else{ RESULT = lit; } :}
+    FLogical ::= Negation:n BooleanTypes:lit                                    {: if((Boolean)n){ RESULT = new TreeNode("!", lit); }else{ RESULT = lit; } :}
         | Negation:n PARIZQ LogicalA:la PARDER                                  {: if((Boolean)n){ RESULT = new TreeNode("!", la); }else{ RESULT = la; } :}
         ;
-TLogical ::= TLogical:tl MULT:m FLogical:fl                                     {: RESULT = new TreeNode(m.toString(), tl, fl); :}
-        | TLogical:tl DIV:d FLogical:fl                                         {: RESULT = new TreeNode(d.toString(), tl, fl); :}
-        | TLogical:tl MOD:m FLogical:fl                                         {: RESULT = new TreeNode(m.toString(), tl, fl); :}
+    TLogical ::= TLogical:tl MULT:m FLogical:fl                                 {: RESULT = new TreeNode("*", tl, fl); :}
+        | TLogical:tl DIV:d FLogical:fl                                         {: RESULT = new TreeNode("/", tl, fl); :}
+        | TLogical:tl MOD:m FLogical:fl                                         {: RESULT = new TreeNode("%", tl, fl); :}
         | FLogical:fl                                                           {: RESULT = fl; :}
         ;
-ELogical ::= ELogical:el PLUS:p TLogical:tl                                     {: RESULT = new TreeNode(p.toString(), el, tl); :} 
-        | ELogical:fl MINUS:m TLogical:tl                                       {: RESULT = new TreeNode(m.toString(), fl, tl); :}
+    ELogical ::= ELogical:el PLUS:p TLogical:tl                                 {: RESULT = new TreeNode("+", el, tl); :} 
+        | ELogical:fl MINUS:m TLogical:tl                                       {: RESULT = new TreeNode("-", fl, tl); :}
         | TLogical:tl                                                           {: RESULT = tl; :}
         ;
 
@@ -193,16 +169,16 @@ ELogical ::= ELogical:el PLUS:p TLogical:tl                                     
 
 //----------- Statement ID or Function Disambiguation
 
-CALL_FUNCTION ::= ID:id PARIZQ PARAMS:p PARDER END                               {: RESULT = new TreeNode(id.toString(), p); :}
-    | ID:id ASSIGN:a E:e END                                                    {: RESULT = new TreeNode(a.toString(), new TreeNode(id.toString()), e); :};
+    CALL_FUNCTION ::= ID:id PARIZQ PARAMS:p PARDER END                          {: RESULT = new TreeNode(id, p); :}
+        | ID:id ASSIGN:a E:e END                                                {: RESULT = new TreeNode("=", new TreeNode(id), e); :};
 
 //----------- Statement ID or Function End
 
 
 //----------- FUNCTION PARAM LIST
 
-    PARAM ::= PARAMS:p COMMA:c ID:id                                            {: ((TreeNode)p).addChild(new TreeNode(id.toString())); RESULT = p; :} 
-        | ID:id                                                                 {: RESULT = new TreeNode("Params", new TreeNode(id.toString())); :};
+    PARAM ::= PARAMS:p COMMA:c ID:id                                            {: ((TreeNode)p).addChild(new TreeNode(id)); RESULT = p; :} 
+        | ID:id                                                                 {: RESULT = new TreeNode("Params", new TreeNode(id)); :};
     PARAMS ::= PARAM:p                                                          {: RESULT = p; :}
         |                                                                       {: RESULT = new TreeNode(""); :};
 
@@ -211,27 +187,28 @@ CALL_FUNCTION ::= ID:id PARIZQ PARAMS:p PARDER END                              
 
 //----------- FUNCTION DECLARATION
 
-RETURN ::= RET:ret LITERALS:lit END                                             {: RESULT = new TreeNode(ret.toString(), lit); :}
-    |                                                                           {: RESULT = new TreeNode(""); :}
-    ;
-ARGUMENT ::= ARGUMENT:arg COMMA TYPES:t ID:id                                   {: ((TreeNode)arg).addChild( new TreeNode(id.toString(), t.toString()) ); RESULT = arg; :}
-    | TYPES:t ID:id                                                             {: RESULT = new TreeNode("Arguments", new TreeNode(id.toString(), t.toString()) ); :}
-    ;
-ARGUMENTS ::= ARGUMENT:args                                                     {: RESULT = args; :}
-    |                                                                           {: RESULT = new TreeNode(""); :}
-    ;
-FUNCTION_TYPES ::= TYPES:t                                                      {: RESULT = t; :} 
-    | NIL:nil                                                                   {: RESULT = new TreeNode(nil.toString()); :}
-    ;
-DECLARE_FUNCTION ::= FUNCTION_TYPES:t ACT:act ID:id PARIZQ ARGUMENTS:args PARDER PROGRAM_BODY:body RETURN:r ACTEND {: RESULT = new TreeNode(act.toString(), t.toString(), new TreeNode(id.toString()), args, body, r); :}
-    ;
+    RETURN ::= RET:ret LITERALS:lit END                                         {: RESULT = new TreeNode("ret", lit); :}
+        |                                                                       {: RESULT = new TreeNode(""); :}
+        ;
+    ARGUMENT ::= ARGUMENT:arg COMMA TYPES:t ID:id                               {: ((TreeNode)arg).addChild( new TreeNode(id, t.toString()) ); RESULT = arg; :}
+        | TYPES:t ID:id                                                         {: RESULT = new TreeNode("Arguments", new TreeNode(id, t.toString()) ); :}
+        ;
+    ARGUMENTS ::= ARGUMENT:args                                                 {: RESULT = args; :}
+        |                                                                       {: RESULT = new TreeNode(""); :}
+        ;
+    FUNCTION_TYPES ::= TYPES:t                                                  {: RESULT = t; :} 
+        | NIL:nil                                                               {: RESULT = "nil"; :}
+        ;
+    DECLARE_FUNCTION ::= FUNCTION_TYPES:t ACT:act ID:id PARIZQ ARGUMENTS:args PARDER PROGRAM_BODY:body RETURN:r ACTEND 
+                                                                                {: RESULT = new TreeNode("act", t, new TreeNode(id), args, body, r); :}
+        ;
 
 //----------- FUNCTION DECLARATION END
 
 
 //----------- _WHILE
 
-    _WHILE ::= TIL:til PARIZQ LogicalA:la PARDER PROGRAM_BODY:body TILEND        {: RESULT = new TreeNode(til.toString(), la, body); :}
+    _WHILE ::= TIL:til PARIZQ LogicalA:la PARDER PROGRAM_BODY:body TILEND       {: RESULT = new TreeNode("til", la, body); :}
         ;
 
 //----------- _WHILE END
@@ -241,74 +218,78 @@ DECLARE_FUNCTION ::= FUNCTION_TYPES:t ACT:act ID:id PARIZQ ARGUMENTS:args PARDER
 
     SWITCH_LITERALS ::= CHAR:ch                                                 {: RESULT = new TreeNode(Character.toString(ch) ); :}
         | DIGIT:dt                                                              {: RESULT = new TreeNode(Integer.toString(dt) ); :}
-        | ID:id                                                                 {: RESULT = new TreeNode(id.toString()); :}
+        | ID:id                                                                 {: RESULT = new TreeNode(id); :}
         ;
-    DEFAULT ::= ANY:any PROGRAM_BODY:body ANYEND                                {: RESULT = new TreeNode(any.toString(), body); :}
+    DEFAULT ::= ANY:any PROGRAM_BODY:body ANYEND                                {: RESULT = new TreeNode("any", body); :}
         |                                                                       {: RESULT = new TreeNode(""); :}
         ;
-    CASE ::= CASE:c OPT:opt PARIZQ SWITCH_LITERALS:sl PARDER PROGRAM_BODY:b OPTEND  {: ((TreeNode)c).addChild( new TreeNode(opt.toString(), sl, b) ); RESULT = c; :}
+    CASE ::= CASE:c OPT:opt PARIZQ SWITCH_LITERALS:sl PARDER PROGRAM_BODY:b OPTEND  
+                                                                                {: ((TreeNode)c).addChild( new TreeNode("opt", sl, b) ); RESULT = c; :}
         |                                                                       {:RESULT = new TreeNode("CASES"); :}
         ;
-    _SWITCH ::= SET:set PARIZQ SWITCH_LITERALS:sl PARDER CASE:c DEFAULT:d SETEND {: RESULT = new TreeNode(set.toString(), sl, c, d); :};
+    _SWITCH ::= SET:set PARIZQ SWITCH_LITERALS:sl PARDER CASE:c DEFAULT:d SETEND 
+                                                                                {: RESULT = new TreeNode("set", sl, c, d); :};
 
 //----------- _SWITCH END
 
 
 //----------- _FOR
 
-FOR_ASSIGN ::= ID:id ASSIGN:a E:e                                               {: RESULT = new TreeNode(a.toString(), new TreeNode(id.toString()), e); :}
-    |                                                                           {: RESULT = new TreeNode(""); :}                             
-    ;
-_FOR ::= REP:rep PARIZQ FOR_ASSIGN:fa END LogicalA:la END FOR_ASSIGN:fa2 PARDER PROGRAM_BODY:body REPEND {: RESULT = new TreeNode(rep.toString(), fa, la, fa2, body); :}
-    ; 
+    FOR_ASSIGN ::= ID:id ASSIGN:a E:e                                           {: RESULT = new TreeNode("=", new TreeNode(id), e); :}
+        |                                                                       {: RESULT = new TreeNode(""); :}                             
+        ;
+    _FOR ::= REP:rep PARIZQ FOR_ASSIGN:fa END LogicalA:la END FOR_ASSIGN:fa2 PARDER PROGRAM_BODY:body REPEND 
+                                                                                {: RESULT = new TreeNode("rep", fa, la, fa2, body); :}
+        ; 
 
 //----------- _FOR END
 
 
 //----------- _IF _ELSE
 
-_ELSE ::= YET:yet PROGRAM_BODY:body YETEND                                       {: RESULT = new TreeNode(yet.toString(), body); :}
-    |                                                                           {: RESULT = new TreeNode(""); :}
-    ;
-_IF ::= COND:cond PARIZQ LogicalA:la PARDER PROGRAM_BODY CONDEND _ELSE:_else       {: RESULT = new TreeNode(cond.toString(), la, _else); :}
-    ;
+    _ELSE ::= YET:yet PROGRAM_BODY:body YETEND                                  {: RESULT = new TreeNode("yet", body); :}
+        |                                                                       {: RESULT = new TreeNode(""); :}
+        ;
+    _IF ::= COND:cond PARIZQ LogicalA:la PARDER PROGRAM_BODY CONDEND _ELSE:_else
+                                                                                {: RESULT = new TreeNode("con", la, _else); :}
+        ;
 
 //----------- _IF _ELSE END
 
 
 //----------- DECLARACIONES
 
-LISTA_IDS ::= LISTA_IDS:li COMMA ID:id                                          {: ((TreeNode)li).addChild(new TreeNode(id.toString())); RESULT = li; :}
-    |   TYPES:type ID:id END                                                    {: RESULT = new TreeNode("Declare ID", type.toString(), new TreeNode(id.toString()) ); :}
-    ;
-DECLARE_VARIABLE ::= TYPES:type ID:id ASSIGN:a E:e END                          {: RESULT = new TreeNode("Declare ID", type.toString(), new TreeNode(a.toString(), new TreeNode(id.toString()) , e) ); :}
-    | LISTA_IDS:li                                                              {: RESULT = li; :}
-    ;
+    LISTA_IDS ::= LISTA_IDS:li COMMA ID:id                                      {: ((TreeNode)li).addChild(new TreeNode(id)); RESULT = li; :}
+        |   TYPES:type ID:id END                                                {: RESULT = new TreeNode("Declare ID", type.toString(), new TreeNode(id) ); :}
+        ;
+    DECLARE_VARIABLE ::= TYPES:type ID:id ASSIGN:a E:e END                      {: RESULT = new TreeNode("Declare ID", type.toString(), new TreeNode("=", new TreeNode(id) , e) ); :}
+        | LISTA_IDS:li                                                          {: RESULT = li; :}
+        ;
 
 //----------- DECLARACIONES END
 
 
 //----------- PROGRAM BEGINNING
 
-STATEMENT ::= DECLARE_VARIABLE:declare                                          {: RESULT = declare; :}
-            | _IF:_if                                                             {: RESULT = _if; :}
-            | _FOR:_for                                                           {: RESULT = _for; :}
-            | _WHILE:_while                                                      {: RESULT = _while; :}
-            | _SWITCH:_switch                                                     {: RESULT = _switch; :}
-            | DECLARE_FUNCTION:function                                         {: RESULT = function; :}
-            | CALL_FUNCTION:callfunction                                         {: RESULT = callfunction; :}
-            ;
+    STATEMENT ::= DECLARE_VARIABLE:declare                                      {: RESULT = declare; :}
+        | _IF:_if                                                               {: RESULT = _if; :}
+        | _FOR:_for                                                             {: RESULT = _for; :}
+        | _WHILE:_while                                                         {: RESULT = _while; :}
+        | _SWITCH:_switch                                                       {: RESULT = _switch; :}
+        | DECLARE_FUNCTION:function                                             {: RESULT = function; :}
+        | CALL_FUNCTION:callfunction                                            {: RESULT = callfunction; :}
+        ;
 
-STATEMENTS ::= STATEMENTS:statements STATEMENT:statement                        {: ((TreeNode)statements).addChild(statement); RESULT = statements; :}
-            | STATEMENT:statement                                               {: RESULT = new TreeNode("Statements", statement); :}
-            | error                                                             {: parser.report_error("Error in a Statement", ""); :}
-            ; 
+    STATEMENTS ::= STATEMENTS:statements STATEMENT:statement                    {: ((TreeNode)statements).addChild(statement); RESULT = statements; :}
+        | STATEMENT:statement                                                   {: RESULT = new TreeNode("Statements", statement); :}
+        | error                                                                 {: parser.report_error("Error in a Statement", ""); :}
+        ; 
 
-PROGRAM_BODY ::= STATEMENTS:statements                                          {: RESULT = statements; :}
-            |                                                                   {: RESULT = new TreeNode(""); :}
-            ;
+    PROGRAM_BODY ::= STATEMENTS:statements                                      {: RESULT = statements; :}
+        |                                                                       {: RESULT = new TreeNode(""); :}
+        ;
 
-PROGRAM ::= MAIN:main PROGRAM_BODY:body MAINEND                                 {: parser.AST = new TreeNode(main.toString(), body); :}
+    PROGRAM ::= MAIN:main PROGRAM_BODY:body MAINEND                             {: RESULT = new TreeNode("Run", body); parser.AST = RESULT; :}
         | error PROGRAM_BODY MAINEND                                            {: parser.report_error("RUN END without RUN", ""); :}
         | MAIN error                                                            {: parser.report_error("Error Reaching RUN END", ""); :}
         ;

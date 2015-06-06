@@ -1,5 +1,10 @@
 run
 
-num numero = 12;
+sym a = 'a';
+num b = 12;
+
+con( a >  b)	
+	bin c = true;
+/con
 
 /run	

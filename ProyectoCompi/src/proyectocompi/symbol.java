@@ -3,19 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+package proyectocompi;
 
 /**
  *
  * @author carlo
  */
-public class LanguageTests {
-    
-    public static void main(String[] args) {
-        if (null == null) {
-            System.out.println("true");
-        }else{
-            System.out.println("false");
-        }
+public class symbol {
+
+    symbol(int DIGIT, Integer integer) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }

@@ -22,26 +22,31 @@ public class TreeNode {
         childs = new ArrayList();
     }
     public TreeNode(String o){
+        System.out.println("New tree node of: "+o);
         operation = o;
         childs = new ArrayList();
     }
     public TreeNode(String o, String t){
+        System.out.println("New tree node of: "+o+" tipo:"+t);
         operation = o;
         type = t;
         childs = new ArrayList();
     }
     public TreeNode(String o, TreeNode... child){
+        System.out.println("New tree node of: "+o);
         operation = o;
         childs = new ArrayList();
         childs.addAll(Arrays.asList(child));
     }
     public TreeNode(String o, String t, TreeNode... child){
+        System.out.println("New tree node of: "+o);
         operation = o;
         type = t;
         childs = new ArrayList();
         childs.addAll(Arrays.asList(child));
     }
     public TreeNode(String o, Object... child){
+        System.out.println("New tree node of: "+o);
         operation = o;
         childs = new ArrayList();
         for(Object c : child){
@@ -49,6 +54,7 @@ public class TreeNode {
         }
     }
     public TreeNode(String o, String t, Object... child){
+        System.out.println("New tree node of: "+o);
         operation = o;
         type = t;
         childs = new ArrayList();
@@ -80,5 +86,11 @@ public class TreeNode {
     }
     public Object empty(){
         return childs.removeAll(childs);
+    }
+    public String toString(){
+        if(this.operation == null)
+            return this.value.toString();
+        else
+            return this.operation;
     }
 }

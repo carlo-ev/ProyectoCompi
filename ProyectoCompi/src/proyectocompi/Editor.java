@@ -355,7 +355,9 @@ public class Editor extends javax.swing.JFrame {
             TieParser parser = new TieParser(lexer);
             parser.setOutput(this.outputPane);
             parser.parse();
+            System.out.println("top node from parser! "+parser.AST.toString());
             if (parser.errors == 0 && TieLexer.lexErrors.isEmpty()) {
+                printNode(parser.AST, "");
                 this.outputPane.append("> Successful Code Parsing! < \n");
             }
         }catch(Exception ex){
@@ -364,6 +366,13 @@ public class Editor extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_barCheckButtonActionPerformed
 
+    private void printNode(TreeNode node, String space){
+        System.out.println(space+"_"+node.toString());
+        for(Object child : node.getChilds()){
+            printNode((TreeNode)child, space+"____");
+        }
+    }
+    
     private void barExitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_barExitButtonActionPerformed
         onProgramExit();
     }//GEN-LAST:event_barExitButtonActionPerformed

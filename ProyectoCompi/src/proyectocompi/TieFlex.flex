@@ -3,15 +3,37 @@ package proyectocompi;
 
 import java.util.ArrayList;
 import javax.swing.JTextArea;
-import java_cup.runtime.*;
+import java_cup.runtime.Symbol;
 %%
 %class TieLexer
 %unicode
 %line
 %column
 %int
-%extends sym
 %cup
+
+%{
+    public static JTextArea outputArea;
+    public static ArrayList<String> lexErrors = new ArrayList<String>();
+
+    public void printOutput(String outputLine){
+            if(outputArea != null){
+                    outputArea.append(outputLine + "\n");
+            } 
+            lexErrors.add(outputLine);
+    }
+    public Symbol symbol(int type){
+        return new Token(type, yyline+1, yycolumn+1, yytext());
+    }
+    public Symbol symbol(int type, Object value){
+        return new Token(type, yyline+1, yycolumn+1, yytext(), value);
+    }
+%}
+
+%eofval{
+    return symbol(sym.EOF);
+%eofval}
+
 
 //Values
 digit = [0-9]+
@@ -91,97 +113,73 @@ include = inc
 
 %state COMMENTS
 
-%{
-    public static JTextArea outputArea;
-    public static ArrayList<String> lexErrors = new ArrayList<String>();
-
-    public void printOutput(String outputLine){
-            if(outputArea != null){
-                    outputArea.append(outputLine + "\n");
-            } 
-            lexErrors.add(outputLine);
-    }
-    public Symbol symbol(int type){
-        return new Token(type, yyline+1, yycolumn+1, yytext());
-    }
-    public Symbol symbol(int type, Object value){
-        return new Token(type, yyline+1, yycolumn+1, yytext(), value);
-    }
-%}
-
-%eofval{
-    return new Symbol(sym.EOF);
-%eofval}
-
 %%
 
 <YYINITIAL>
 {
-	{number} 			{return new Symbol(sym.NUM);}
-	{binary} 			{return new Symbol(sym.BIN);}
-	{decimal} 			{return new Symbol(sym.DEC);}
-	{symbol} 			{return new Symbol(sym.SYM);}
-	{cadena}			{return new Symbol(sym.STR);}
-	{assign}			{return new Symbol(sym.ASSIGN);}
+	{number} 			{return symbol(sym.NUM);}
+	{binary} 			{return symbol(sym.BIN);}
+	{decimal} 			{return symbol(sym.DEC);}
+	{symbol} 			{return symbol(sym.SYM);}
+	{cadena}			{return symbol(sym.STR);}
+	{assign}			{return symbol(sym.ASSIGN);}
 
-        {terminal} 			{return new Symbol(sym.END);}
+        {terminal} 			{return symbol(sym.END);}
 
-	{repetition}                    {return new Symbol(sym.REP);}
-	{repetitionEnd}                 {return new Symbol(sym.REPEND);}
+	{repetition}                    {return symbol(sym.REP);}
+	{repetitionEnd}                 {return symbol(sym.REPEND);}
 
-	{condition}                     {return new Symbol(sym.COND);}
-	{conditionEnd}                  {return new Symbol(sym.CONDEND);}
-	{yet} 				{return new Symbol(sym.YET);}
-        {yetend}                        {return new Symbol(sym.YETEND);}
+	{condition}                     {return symbol(sym.COND);}
+	{conditionEnd}                  {return symbol(sym.CONDEND);}
+	{yet} 				{return symbol(sym.YET);}
+        {yetend}                        {return symbol(sym.YETEND);}
 	
-	{set} 				{return new Symbol(sym.SET);}
-	{setEnd} 			{return new Symbol(sym.SETEND);}
-	{option} 			{return new Symbol(sym.OPT);}
-	{any}				{return new Symbol(sym.ANY);}
+	{set} 				{return symbol(sym.SET);}
+	{setEnd} 			{return symbol(sym.SETEND);}
+	{option} 			{return symbol(sym.OPT);}
+	{any}				{return symbol(sym.ANY);}
 
-	{til}				{return new Symbol(sym.TIL);}
-	{tilEnd}			{return new Symbol(sym.TILEND);}
+	{til}				{return symbol(sym.TIL);}
+	{tilEnd}			{return symbol(sym.TILEND);}
 	
-	{main} 				{return new Symbol(sym.MAIN);}
-	{mainEnd}		 	{return new Symbol(sym.MAINEND);}
+	{main} 				{return symbol(sym.MAIN);}
+	{mainEnd}		 	{return symbol(sym.MAINEND);}
 
-        {act} 				{return new Symbol(sym.ACT);}
-	{actEnd} 			{return new Symbol(sym.ACTEND);}
-	{return} 			{return new Symbol(sym.RET);}
+        {act} 				{return symbol(sym.ACT);}
+	{actEnd} 			{return symbol(sym.ACTEND);}
+	{return} 			{return symbol(sym.RET);}
 
-	{void} 				{return new Symbol(sym.NIL);}
+	{void} 				{return symbol(sym.NIL);}
 
-	{plus}				{return new Symbol(sym.PLUS);}
-	{minus}				{return new Symbol(sym.MINUS);}
-	{mult}				{return new Symbol(sym.MULT);}
-	{div}				{return new Symbol(sym.DIV);}
-	{mod}				{return new Symbol(sym.MOD);}
+	{plus}				{return symbol(sym.PLUS);}
+	{minus}				{return symbol(sym.MINUS);}
+	{mult}				{return symbol(sym.MULT);}
+	{div}				{return symbol(sym.DIV);}
+	{mod}				{return symbol(sym.MOD);}
 
-	{and}				{return new Symbol(sym.AND);}
-	{or}				{return new Symbol(sym.OR);}
-	{lessThan}			{return new Symbol(sym.LESSTHAN);}
-	{greaterThan}                   {return new Symbol(sym.GREATERTHAN);}
-	{lessEqualThan}                 {return new Symbol(sym.LESSEQUALTHAN);}
-	{greaterEqualThan}              {return new Symbol(sym.GREATEREQUALTHAN);}
-	{equal}				{return new Symbol(sym.EQUAL);}
-	{unEqual}			{return new Symbol(sym.NOTEQUAL);}
-	{not}				{return new Symbol(sym.NOT);}
-/*
-        {this}                          {return new Symbol(sym.THIS);}
-*/
-	{comma}				{return new Symbol(sym.COMMA);}
-        {parIzq}			{return new Symbol(sym.PARIZQ);}
-	{parDer}			{return new Symbol(sym.PARDER);}
+	{and}				{return symbol(sym.AND);}
+	{or}				{return symbol(sym.OR);}
+	{lessThan}			{return symbol(sym.LESSTHAN);}
+	{greaterThan}                   {return symbol(sym.GREATERTHAN);}
+	{lessEqualThan}                 {return symbol(sym.LESSEQUALTHAN);}
+	{greaterEqualThan}              {return symbol(sym.GREATEREQUALTHAN);}
+	{equal}				{return symbol(sym.EQUAL);}
+	{unEqual}			{return symbol(sym.NOTEQUAL);}
+	{not}				{return symbol(sym.NOT);}
+
+	{comma}				{return symbol(sym.COMMA);}
+        {parIzq}			{return symbol(sym.PARIZQ);}
+	{parDer}			{return symbol(sym.PARDER);}
 
 	{commentStart}                  {yybegin(COMMENTS);}
 
-	{digit}				{return new Symbol( sym.DIGIT, new Integer(yytext()) );}
-	{boolean}			{return new Symbol( sym.BOOL, new Boolean(yytext()) );}
-	{string}			{return new Symbol( sym.STRING, new String(yytext()) );}
-	{character}			{return new Symbol( sym.CHAR, new Character(yytext().charAt(0)) );}
-	{float}				{return new Symbol( sym.FLOAT, new Double(yytext()) );}
+	{digit}				{return symbol( sym.DIGIT, new Integer(yytext()) );}
+	{boolean}			{return symbol( sym.BOOL, new Boolean(yytext()) );}
+	{string}			{return symbol( sym.STRING, new String(yytext()) );}
+	{character}			{return symbol( sym.CHAR, new Character(yytext().charAt(0)) );}
+	{float}				{return symbol( sym.FLOAT, new Float(yytext()) );}
 
-	{id}				{return new Symbol(sym.ID);}
+	{id}				{return symbol(sym.ID, new String(yytext()));}
 	{whitespace}                    {}
 	. 				{this.printOutput("> Unknown Token: '"+yytext()+"' in Line "+Integer.toString(yyline)+" Column "+Integer.toString(yycolumn) );}
 
