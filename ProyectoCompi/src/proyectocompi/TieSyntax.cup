@@ -81,6 +81,8 @@ parser code {:
     non terminal TreeNode _FOR, FOR_ASSIGN;
     non terminal TreeNode PARAMS, CALL_FUNCTION, PARAM, RETURN, ARGUMENT, ARGUMENTS, DECLARE_FUNCTION;
 
+//-----------Presedencia
+presedence left NOT, AND, OR
 
 start with PROGRAM;
 
