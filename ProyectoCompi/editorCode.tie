@@ -1,10 +1,20 @@
 run
 
-sym a = 'a';
-num b = 12;
+	num numero = 12;
+    sym caracter = 'a';
+    dec decimal = 12.00;
+    bin booleano  = true;
 
-con( a >  b)	
-	bin c = true;
-/con
+	con( true )
+	/con
+
+	set(id)
+		opt(12)
+			num numero = 12;
+    		sym caracter = 'a';
+    		dec decimal = 12.00;
+    		bin booleano  = true;
+		/opt
+	/set	
 
 /run	

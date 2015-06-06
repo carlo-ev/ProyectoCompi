@@ -137,7 +137,9 @@ include = inc
 	{set} 				{return symbol(sym.SET);}
 	{setEnd} 			{return symbol(sym.SETEND);}
 	{option} 			{return symbol(sym.OPT);}
+        {optionEnd}                     {return symbol(sym.OPTEND);}
 	{any}				{return symbol(sym.ANY);}
+        {anyEnd}                        {return symbol(sym.ANYEND);}
 
 	{til}				{return symbol(sym.TIL);}
 	{tilEnd}			{return symbol(sym.TILEND);}

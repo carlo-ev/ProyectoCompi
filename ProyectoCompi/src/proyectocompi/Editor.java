@@ -185,7 +185,7 @@ public class Editor extends javax.swing.JFrame {
 
         editorTextArea.setColumns(20);
         editorTextArea.setRows(5);
-        editorTextArea.setTabSize(2);
+        editorTextArea.setTabSize(1);
         editorTextArea.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 editorKeyPress(evt);
