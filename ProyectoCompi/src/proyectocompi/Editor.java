@@ -99,7 +99,7 @@ public class Editor extends javax.swing.JFrame {
         });
         
         //Editor Shortcuts
-        shortcuts.put("run", "\n\n\n/run");
+        shortcuts.put("run", "\n\n\n\n/run");
         shortcuts.put("rep", "(num i=0;i<10;i=i+1)\n\n/rep");
         shortcuts.put("set", "(id)\nopt 1\n\n/opt\n\n/set");
         shortcuts.put("act", " funcion1()\n\n/act");

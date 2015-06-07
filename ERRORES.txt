@@ -1,0 +1,4 @@
+ERRORES que vienen desde compi 1
+
+1) No se recupera de errores al definir statements con sin un /con que con lleva un statement booleano
+2) Truena con null pointer exception cuando definimos un for que lleva una declaracion con primer argumento => rep(num i = 0 lo correcto es rep( i =0 pero en el primero truena

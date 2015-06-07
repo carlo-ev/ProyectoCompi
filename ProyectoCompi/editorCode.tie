@@ -1,5 +1,10 @@
 run
+<<<<<<< HEAD
     num numero = 12;
+=======
+
+	num numero = 12;
+>>>>>>> 060e35e25a75f0b99077b0b06dab12df1851f561
     sym caracter = 'a';
     dec decimal = 12.00;
     bin booleano  = true;
@@ -9,6 +14,7 @@ run
             /opt 
     /set
 
+<<<<<<< HEAD
     bin act funcion() 
         sym algo = 'a';
         con(deci1 == 0)
@@ -23,6 +29,54 @@ run
     rep(i=0;i<10;i=i+1)
         numero = numero + i;
     /rep
+=======
+	con( i < 10)
+		num numero = 12;
+    	sym caracter = 'a';
+    	dec decimal = 12.00;
+    	bin booleano  = true;
+	/con
+
+	rep( i = 0 ;i < 10; i = i+1)
+		num numero = 12;
+    	sym caracter = 'a';
+    	dec decimal = 12.00;
+    	bin booleano  = true;
+	/rep	
+
+	til( i < 10)
+		num numero = 12;
+    	sym caracter = 'a';
+ 	 	dec decimal = 12.00;
+    	bin booleano  = true;
+	/til	
+
+	bin act funcion( num i, bin a )
+		num numero = 12;
+    	sym caracter = 'a';
+    	dec decimal = 12.00;
+    	bin booleano  = true;
+
+		ret true;
+	/act
+
+	funcion( 12, true );
+
+	set( id )
+		opt( 2 )
+			num numero = 12;
+    		sym caracter = 'a';
+    		dec decimal = 12.00;
+    		bin booleano  = true;
+		/opt
+		any
+			num numero = 12;
+    		sym caracter = 'a';
+    		dec decimal = 12.00;
+    		bin booleano  = true;
+		/any
+	/set
+>>>>>>> 060e35e25a75f0b99077b0b06dab12df1851f561
 
     til(i<10)
         sym s = 'p';

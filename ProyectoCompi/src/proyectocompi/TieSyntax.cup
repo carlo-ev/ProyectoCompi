@@ -93,11 +93,11 @@ start with PROGRAM;
         | STR:str                                                               {: RESULT = "str"; :}
         ;
 
-    LITERALS ::= BOOL:bl                                                        {: RESULT = new TreeNode( Boolean.toString(bl) ); :} 
-        | DIGIT:dt                                                              {: RESULT = new TreeNode( Integer.toString(dt) ); :}
-        | FLOAT:ft                                                              {: RESULT = new TreeNode( Float.toString(ft) ); :}
-        | CHAR:chr                                                              {: RESULT = new TreeNode( Character.toString(chr) ); :}
-        | STRING:str                                                            {: RESULT = new TreeNode(str); :}
+    LITERALS ::= BOOL:bl                                                        {: RESULT = new TreeNode( Boolean.toString(bl), "bin" ); :} 
+        | DIGIT:dt                                                              {: RESULT = new TreeNode( Integer.toString(dt), "num" ); :}
+        | FLOAT:ft                                                              {: RESULT = new TreeNode( Float.toString(ft), "dec" ); :}
+        | CHAR:chr                                                              {: RESULT = new TreeNode( Character.toString(chr), "sym" ); :}
+        | STRING:str                                                            {: RESULT = new TreeNode(str, "str"); :}
         | ID:id                                                                 {: RESULT = new TreeNode(id); :}
         | ID:id PARIZQ PARAMS:p PARDER                                          {: RESULT = new TreeNode(id, p); :}
         ;
@@ -204,7 +204,7 @@ start with PROGRAM;
         | NIL:nil                                                               {: RESULT = "nil"; :}
         ;
     DECLARE_FUNCTION ::= FUNCTION_TYPES:t ACT:act ID:id PARIZQ ARGUMENTS:args PARDER PROGRAM_BODY:body RETURN:r ACTEND 
-                                                                                {: RESULT = new TreeNode("act", t, new TreeNode(id), args, body, r); :}
+                                                                                {: RESULT = new TreeNode("act", t, new TreeNode(id, "act"), args, body, r); :}
         ;
 
 //----------- FUNCTION DECLARATION END

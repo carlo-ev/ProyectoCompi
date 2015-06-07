@@ -179,7 +179,7 @@ include = inc
 	{digit}				{return symbol( sym.DIGIT, new Integer(yytext()) );}
 	{boolean}			{return symbol( sym.BOOL, new Boolean(yytext()) );}
 	{string}			{return symbol( sym.STRING, new String(yytext()) );}
-	{character}			{return symbol( sym.CHAR, new Character(yytext().charAt(0)) );}
+	{character}			{return symbol( sym.CHAR, new Character(yytext().charAt(1)) );}
 	{float}				{return symbol( sym.FLOAT, new Float(yytext()) );}
 
 	{id}				{return symbol(sym.ID, new String(yytext()));}

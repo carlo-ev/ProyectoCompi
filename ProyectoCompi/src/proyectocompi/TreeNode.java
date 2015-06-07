@@ -90,9 +90,9 @@ public class TreeNode {
     }
     public String toString(){
         if(this.operation == null)
-            return this.value.toString();
+            return this.value.toString() + ":" + this.type;
         else
-            return this.operation;
+            return this.operation + ":" + this.type;
     }
     public String getOperation(){
         return this.operation;
