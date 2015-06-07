@@ -128,11 +128,16 @@ public class TieSemantics {
     
     public void typeRun(TreeNode actual, SymbolTable table){
         if (actual.operation.equals("=")) {
-            
+            TieSymbol id = table.findSymbol(actual.childs.get(0).operation);
+            if(id == null){
+                this.typeErrors.add("Variable "+ actual.childs.get(0).operation + " is not defined.");
+            }else{
+                
+            }
         }else if(actual.operation.equals("Declare ID")){
             typeRun(actual.childs.get(0), table);
         }else if(actual.operation.equals("con")){
-        
+            
         }else if(actual.operation.equals("til")){
         }else if(actual.operation.equals("rep")){
         }else if(actual.operation.equals("set")){

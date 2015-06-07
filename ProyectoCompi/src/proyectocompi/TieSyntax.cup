@@ -96,8 +96,8 @@ start with PROGRAM;
     LITERALS ::= BOOL:bl                                                        {: RESULT = new TreeNode( Boolean.toString(bl), "bin" ); :} 
         | DIGIT:dt                                                              {: RESULT = new TreeNode( Integer.toString(dt), "num" ); :}
         | FLOAT:ft                                                              {: RESULT = new TreeNode( Float.toString(ft), "dec" ); :}
-        | CHAR:chr                                                              {: RESULT = new TreeNode( Character.toString(chr), "sym" ); :}
-        | STRING:str                                                            {: RESULT = new TreeNode(str, "str"); :}
+        | CHAR:chr                                                              {: RESULT = new TreeNode("'" + Character.toString(chr) + "'", "sym" ); :}
+        | STRING:str                                                            {: RESULT = new TreeNode('"' + str + '"', "str"); :}
         | ID:id                                                                 {: RESULT = new TreeNode(id); :}
         | ID:id PARIZQ PARAMS:p PARDER                                          {: RESULT = new TreeNode(id, p); :}
         ;
@@ -152,7 +152,7 @@ start with PROGRAM;
     BooleanTypes ::= BOOL:bl                                                    {: RESULT = new TreeNode( Boolean.toString(bl) ); :}
         | DIGIT:di                                                              {: RESULT = new TreeNode( Integer.toString(di) ); :}
         | FLOAT:fl                                                              {: RESULT = new TreeNode( Float.toString(fl) ); :}
-        | CHAR:ch                                                               {: RESULT = new TreeNode( Character.toString(ch) ); :}
+        | CHAR:ch                                                               {: RESULT = new TreeNode("'" + Character.toString(ch) ) + "'"; :}
         | ID:id                                                                 {: RESULT = new TreeNode(id); :}
         ;
     FLogical ::= Negation:n BooleanTypes:lit                                    {: if((Boolean)n){ RESULT = new TreeNode("!", lit); }else{ RESULT = lit; } :}
@@ -220,7 +220,7 @@ start with PROGRAM;
 
 //----------- _SWITCH 
 
-    SWITCH_LITERALS ::= CHAR:ch                                                 {: RESULT = new TreeNode(Character.toString(ch) ); :}
+    SWITCH_LITERALS ::= CHAR:ch                                                 {: RESULT = new TreeNode("'" + Character.toString(ch) + "'"); :}
         | DIGIT:dt                                                              {: RESULT = new TreeNode(Integer.toString(dt) ); :}
         | ID:id                                                                 {: RESULT = new TreeNode(id); :}
         ;
