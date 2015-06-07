@@ -1,10 +1,7 @@
 run
 
-sym a = 'a';
-num b = 12;
+nil act bla()
 
-con( a >  b)	
-	bin c = true;
-/con
+/act	
 
 /run	

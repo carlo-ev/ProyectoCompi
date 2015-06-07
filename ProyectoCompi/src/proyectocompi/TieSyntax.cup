@@ -82,7 +82,7 @@ parser code {:
     non terminal TreeNode PARAMS, CALL_FUNCTION, PARAM, RETURN, ARGUMENT, ARGUMENTS, DECLARE_FUNCTION;
 
 //-----------Presedencia
-presedence left NOT, AND, OR
+precedence left NOT, AND, OR;
 
 start with PROGRAM;
 
@@ -114,7 +114,7 @@ start with PROGRAM;
         | GREATERTHAN:gt                                                        {: RESULT = ">"; :} 
         | LESSEQUALTHAN:let                                                     {: RESULT = "<="; :}
         | GREATEREQUALTHAN:get                                                  {: RESULT = ">="; :}
-        | EQUAL:e                                                               {: RESULT = "="; :}
+        | EQUAL:e                                                               {: RESULT = "=="; :}
         | NOTEQUAL:ne                                                           {: RESULT = "!="; :}
         ;
 
@@ -150,8 +150,10 @@ start with PROGRAM;
 //----------- Arithmetic Operations for Logical Statements
 
     BooleanTypes ::= BOOL:bl                                                    {: RESULT = new TreeNode( Boolean.toString(bl) ); :}
+        | DIGIT:di                                                              {: RESULT = new TreeNode( Integer.toString(di) ); :}
+        | FLOAT:fl                                                              {: RESULT = new TreeNode( Float.toString(fl) ); :}
+        | CHAR:ch                                                               {: RESULT = new TreeNode( Character.toString(ch) ); :}
         | ID:id                                                                 {: RESULT = new TreeNode(id); :}
-        | ID:id PARIZQ PARAMS:p PARDER                                          {: RESULT = new TreeNode(id, p); :}
         ;
     FLogical ::= Negation:n BooleanTypes:lit                                    {: if((Boolean)n){ RESULT = new TreeNode("!", lit); }else{ RESULT = lit; } :}
         | Negation:n PARIZQ LogicalA:la PARDER                                  {: if((Boolean)n){ RESULT = new TreeNode("!", la); }else{ RESULT = la; } :}
@@ -179,8 +181,8 @@ start with PROGRAM;
 
 //----------- FUNCTION PARAM LIST
 
-    PARAM ::= PARAMS:p COMMA:c ID:id                                            {: ((TreeNode)p).addChild(new TreeNode(id)); RESULT = p; :} 
-        | ID:id                                                                 {: RESULT = new TreeNode("Params", new TreeNode(id)); :};
+    PARAM ::= PARAMS:p COMMA:c BooleanTypes:bt                                  {: ((TreeNode)p).addChild(bt); RESULT = p; :} 
+        | BooleanTypes:bt                                                       {: RESULT = new TreeNode("Params", bt); :};
     PARAMS ::= PARAM:p                                                          {: RESULT = p; :}
         |                                                                       {: RESULT = new TreeNode(""); :};
 
