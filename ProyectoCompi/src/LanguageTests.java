@@ -11,11 +11,7 @@
 public class LanguageTests {
     
     public static void main(String[] args) {
-        if (null == null) {
-            System.out.println("true");
-        }else{
-            System.out.println("false");
-        }
+        int i;
     }
     
 }

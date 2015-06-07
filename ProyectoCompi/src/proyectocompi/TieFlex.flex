@@ -38,7 +38,8 @@ import java_cup.runtime.Symbol;
 //Values
 digit = [0-9]+
 boolean = (true|false)
-character = \'(.|\s)\'
+//character = \'(.|\s)\'
+character = \'.\'
 string = \"(.|\s|\t|\n)*\"
 float = {digit}(\.[0.-9]{1,2})?
 whitespace = [\s|\t\|\r|\n]+

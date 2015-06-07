@@ -1,26 +1,30 @@
 run
-
-<<<<<<< HEAD
-nil act bla()
-
-/act	
-=======
-	num numero = 12;
+    num numero = 12;
     sym caracter = 'a';
     dec decimal = 12.00;
     bin booleano  = true;
+    set(tucara)
+            opt (15)
+                dec deci1 = 33.2;
+            /opt 
+    /set
 
-	con( true )
-	/con
+    bin act funcion() 
+        sym algo = 'a';
+        con(deci1 == 0)
+            bin flag = 1;
+        /con
+        yet
+            bin flag = 0;
+        /yet
+        ret flag;
+    /act
 
-	set(id)
-		opt(12)
-			num numero = 12;
-    		sym caracter = 'a';
-    		dec decimal = 12.00;
-    		bin booleano  = true;
-		/opt
-	/set	
->>>>>>> ca4f6e255f79c990e642cf2dbb0fd445136dd35f
+    rep(i=0;i<10;i=i+1)
+        numero = numero + i;
+    /rep
 
-/run	
+    til(i<10)
+        sym s = 'p';
+    /til
+/run

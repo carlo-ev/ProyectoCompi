@@ -31,4 +31,8 @@ public class TieSymbol {
         this.address = address;
     }
     
+    public String toString(){
+        return "Name: " + this.id + " Type: "+ this.type + " Depth: " + Integer.toString(this.depth);
+    }
+    
 }

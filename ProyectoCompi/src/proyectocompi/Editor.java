@@ -355,9 +355,10 @@ public class Editor extends javax.swing.JFrame {
             TieParser parser = new TieParser(lexer);
             parser.setOutput(this.outputPane);
             parser.parse();
-            System.out.println("top node from parser! "+parser.AST.toString());
             if (parser.errors == 0 && TieLexer.lexErrors.isEmpty()) {
                 printNode(parser.AST, "");
+                TieSemantics semanticCheck = new TieSemantics(parser.AST);
+                semanticCheck.typeCheck();
                 this.outputPane.append("> Successful Code Parsing! < \n");
             }
         }catch(Exception ex){

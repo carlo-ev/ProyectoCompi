@@ -173,7 +173,7 @@ start with PROGRAM;
 
 //----------- Statement ID or Function Disambiguation
 
-    CALL_FUNCTION ::= ID:id PARIZQ PARAMS:p PARDER END                          {: RESULT = new TreeNode(id, p); :}
+    CALL_FUNCTION ::= ID:id PARIZQ PARAMS:p PARDER END                          {: RESULT = new TreeNode("Call Function", id, p); :}
         | ID:id ASSIGN:a E:e END                                                {: RESULT = new TreeNode("=", new TreeNode(id), e); :};
 
 //----------- Statement ID or Function End
@@ -254,8 +254,8 @@ start with PROGRAM;
     _ELSE ::= YET:yet PROGRAM_BODY:body YETEND                                  {: RESULT = new TreeNode("yet", body); :}
         |                                                                       {: RESULT = new TreeNode(""); :}
         ;
-    _IF ::= COND:cond PARIZQ LogicalA:la PARDER PROGRAM_BODY CONDEND _ELSE:_else
-                                                                                {: RESULT = new TreeNode("con", la, _else); :}
+    _IF ::= COND:cond PARIZQ LogicalA:la PARDER PROGRAM_BODY:body CONDEND _ELSE:_else
+                                                                                {: RESULT = new TreeNode("con", la, body, _else); :}
         ;
 
 //----------- _IF _ELSE END

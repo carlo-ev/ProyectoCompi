@@ -13,8 +13,8 @@ import java.util.ArrayList;
  */
 public class SymbolTable {
     
-    private SymbolTable parentTable;
-    private ArrayList<TieSymbol> table;
+    public SymbolTable parentTable;
+    public ArrayList<TieSymbol> table;
     
     public SymbolTable(){
         table = new ArrayList();
@@ -39,7 +39,27 @@ public class SymbolTable {
             return this.parentTable.findSymbol(id);
         }else{
             return null;
-        }
-        
+        }     
     }
+    
+    public void addSymbol(String id, String type, int depth, int address){
+        this.table.add(new TieSymbol(id, type, depth, address));
+    }
+    
+    public void addSymbol(String id, String type, int depth){
+        this.table.add(new TieSymbol(id, type, depth));
+    }
+    
+    public void addSymbol(TieSymbol sym){
+        this.table.add(sym);
+    }
+ 
+    public String toString(){
+        String tableString =  "-> Symbol Table <-\n";
+        for(TieSymbol row : table){
+            tableString += row.toString() + "\n";
+        }
+        return tableString;
+    }
+    
 }

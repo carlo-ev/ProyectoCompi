@@ -17,36 +17,32 @@ public class TreeNode {
     public ArrayList<TreeNode> childs;
     Object value;
     public String type;
+    public SymbolTable scope;
     public TreeNode(){
         operation = "";
         childs = new ArrayList();
     }
     public TreeNode(String o){
-        System.out.println("New tree node of: "+o);
         operation = o;
         childs = new ArrayList();
     }
     public TreeNode(String o, String t){
-        System.out.println("New tree node of: "+o+" tipo:"+t);
         operation = o;
         type = t;
         childs = new ArrayList();
     }
     public TreeNode(String o, TreeNode... child){
-        System.out.println("New tree node of: "+o);
         operation = o;
         childs = new ArrayList();
         childs.addAll(Arrays.asList(child));
     }
     public TreeNode(String o, String t, TreeNode... child){
-        System.out.println("New tree node of: "+o);
         operation = o;
         type = t;
         childs = new ArrayList();
         childs.addAll(Arrays.asList(child));
     }
     public TreeNode(String o, Object... child){
-        System.out.println("New tree node of: "+o);
         operation = o;
         childs = new ArrayList();
         for(Object c : child){
@@ -54,7 +50,6 @@ public class TreeNode {
         }
     }
     public TreeNode(String o, String t, Object... child){
-        System.out.println("New tree node of: "+o);
         operation = o;
         type = t;
         childs = new ArrayList();
@@ -66,6 +61,12 @@ public class TreeNode {
     public TreeNode(Object val){
         operation = "";
         childs = new ArrayList();
+        value = val;
+    }
+    public TreeNode(Object val, String type, TreeNode... child){
+        operation = "";
+        childs = new ArrayList();
+        childs.addAll(Arrays.asList(child));
         value = val;
     }
     public TreeNode(Object val, TreeNode... child){
@@ -92,5 +93,8 @@ public class TreeNode {
             return this.value.toString();
         else
             return this.operation;
+    }
+    public String getOperation(){
+        return this.operation;
     }
 }
