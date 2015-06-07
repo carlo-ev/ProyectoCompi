@@ -1,7 +1,26 @@
 run
 
+<<<<<<< HEAD
 nil act bla()
 
 /act	
+=======
+	num numero = 12;
+    sym caracter = 'a';
+    dec decimal = 12.00;
+    bin booleano  = true;
+
+	con( true )
+	/con
+
+	set(id)
+		opt(12)
+			num numero = 12;
+    		sym caracter = 'a';
+    		dec decimal = 12.00;
+    		bin booleano  = true;
+		/opt
+	/set	
+>>>>>>> ca4f6e255f79c990e642cf2dbb0fd445136dd35f
 
 /run	

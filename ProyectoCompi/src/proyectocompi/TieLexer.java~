@@ -806,7 +806,7 @@ class TieLexer implements java_cup.runtime.Scanner {
           }
         case 77: break;
         case 26: 
-          { return symbol( sym.FLOAT, new Double(yytext()) );
+          { return symbol( sym.FLOAT, new Float(yytext()) );
           }
         case 78: break;
         case 27: 
