@@ -11,6 +11,7 @@
 public class LanguageTests {
     
     public static void main(String[] args) {
+        char a = ' ';
         if (null == null) {
             System.out.println("true");
         }else{

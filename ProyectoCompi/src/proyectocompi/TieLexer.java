@@ -852,7 +852,7 @@ class TieLexer implements java_cup.runtime.Scanner {
           }
         case 90: break;
         case 37: 
-          { return symbol( sym.CHAR, new Character(yytext().charAt(0)) );
+          { return symbol( sym.CHAR, new Character(yytext().charAt(1)) );
           }
         case 91: break;
         case 38: 

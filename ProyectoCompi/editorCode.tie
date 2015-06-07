@@ -1,26 +1,55 @@
 run
 
-<<<<<<< HEAD
-nil act bla()
-
-/act	
-=======
 	num numero = 12;
     sym caracter = 'a';
     dec decimal = 12.00;
     bin booleano  = true;
 
-	con( true )
+	con( i < 10)
+		num numero = 12;
+    	sym caracter = 'a';
+    	dec decimal = 12.00;
+    	bin booleano  = true;
 	/con
 
-	set(id)
-		opt(12)
+	rep( i = 0 ;i < 10; i = i+1)
+		num numero = 12;
+    	sym caracter = 'a';
+    	dec decimal = 12.00;
+    	bin booleano  = true;
+	/rep	
+
+	til( i < 10)
+		num numero = 12;
+    	sym caracter = 'a';
+ 	 	dec decimal = 12.00;
+    	bin booleano  = true;
+	/til	
+
+	bin act funcion( num i, bin a )
+		num numero = 12;
+    	sym caracter = 'a';
+    	dec decimal = 12.00;
+    	bin booleano  = true;
+
+		ret true;
+	/act
+
+	funcion( 12, true );
+
+	set( id )
+		opt( 2 )
 			num numero = 12;
     		sym caracter = 'a';
     		dec decimal = 12.00;
     		bin booleano  = true;
 		/opt
-	/set	
->>>>>>> ca4f6e255f79c990e642cf2dbb0fd445136dd35f
+		any
+			num numero = 12;
+    		sym caracter = 'a';
+    		dec decimal = 12.00;
+    		bin booleano  = true;
+		/any
+	/set
 
 /run	
