@@ -9,18 +9,14 @@
  * @author carlo
  */
 public class LanguageTests {
-    
+
     public static void main(String[] args) {
-<<<<<<< HEAD
-        int i;
-=======
-        char a = ' ';
-        if (null == null) {
-            System.out.println("true");
+        Boolean id = false;
+        if (id) {
+            int a;
         }else{
-            System.out.println("false");
+            int a;
         }
->>>>>>> 060e35e25a75f0b99077b0b06dab12df1851f561
     }
     
 }

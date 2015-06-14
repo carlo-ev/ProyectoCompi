@@ -25,6 +25,7 @@ public class SymbolTable {
     }
     
     public TieSymbol findSymbol(String id){
+        System.out.println("Finding symbol");
         TieSymbol sym = null;
         for(TieSymbol temp : table){
             if( temp.id.equals(id) ){
@@ -40,6 +41,16 @@ public class SymbolTable {
         }else{
             return null;
         }     
+    }
+    
+    public TieSymbol findLocalSymbol(String id){
+        TieSymbol sym = null;
+        for(TieSymbol temp : table){
+            if( temp.id.equals(id) ){
+                sym = temp;
+            }
+        }
+        return sym;
     }
     
     public void addSymbol(String id, String type, int depth, int address){
