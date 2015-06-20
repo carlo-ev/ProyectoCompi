@@ -1,6 +1,12 @@
 run
 
+con(id)
+/con
+
 num id;
-id = true;
+
+til(id)
+	id = true;
+/til
 
 /run	

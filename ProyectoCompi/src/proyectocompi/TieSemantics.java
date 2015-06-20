@@ -151,16 +151,19 @@ public class TieSemantics {
     
     public void typeRun(TreeNode actual, SymbolTable table){
         System.out.println("Current Operation on type check " + actual.operation);
-        if (actual.operation.equals("Run")) {
-            typeRun(actual.childs.get(0), table);
-        }else if(actual.operation.isEmpty()){
+        
+        if (actual.operation.isEmpty()){
             return;
-        }else if(actual.operation.equals("Statements")){
+        }else if(actual.operation.equals("Run")) { //Nodo inicial de todo el programa so es filler
+            typeRun(actual.childs.get(0), table);
+            
+        }else if(actual.operation.equals("Statements")){//Chequeo de tipos para cada statement en el programa
             for (TreeNode statement : actual.childs) {
                 typeRun(statement, table);
             }
-        }else if (actual.operation.equals("=")) {
-            System.out.println(actual.childs.size());
+            
+        }else if (actual.operation.equals("=")) {//Chequeo para statement de asignacion
+            //Verificando que la variable exista y qe los tipos de asignacion y variable concuerden
             TieSymbol id = table.findSymbol(actual.childs.get(0).operation);
             if(id == null){
                 this.typeErrors.add("Variable "+ actual.childs.get(0).operation + " no esta declarada.");
@@ -169,10 +172,13 @@ public class TieSemantics {
                 String leftType = id.type;
                 String rightType = "";
                 char rightOperationType = getOperationType(rightOperation);
-                switch(rightOperationType)
-                {
+                //Verificamos el lado derecho de la asignacion, si es id, valor, funcion, etc...
+                switch(rightOperationType){
                     case 'o':
-                        rightType = operationTypeCheck(rightOperation, table);
+                    case 'b':
+                    case 'c':
+                    case 'e':
+                        rightType = operationTypeCheck(rightOperation, rightOperationType, table);
                         break;
                     case 'l':
                         rightType = rightOperation.type;
@@ -181,8 +187,7 @@ public class TieSemantics {
                         TieSymbol localId = table.findSymbol(rightOperation.operation);
                         if(localId != null)
                             rightType = localId.type;
-                        else
-                        {
+                        else{
                             rightType = "";
                             this.typeErrors.add("Variable "+ rightOperation.operation + " no esta declarada.");
                         }
@@ -193,84 +198,209 @@ public class TieSemantics {
                 }
                 
                 if (! leftType.equals(rightType)) {
-                    this.typeErrors.add("Tipos incompatibles: " + leftType + " no puede ser convertido a " + rightType);
+                    this.typeErrors.add("Tipos incompatibles: " + rightType + " no puede ser convertido a " + leftType);
                 }
-
             }
-        }else if(actual.operation.equals("Declare ID")){
+        }else if(actual.operation.equals("Declare ID")){//Si se declara id con tipo solamente si es asignacion se verifica tipos
             if (actual.childs.get(0).operation.equals("=")) {
                 typeRun(actual.childs.get(0), table);
             }
-        }else if(actual.operation.equals("con")){
+        }else if(actual.operation.equals("con") || actual.operation.equals("til")){
+            //Getting the boolean condition statement
+            TreeNode conditionNode = actual.childs.get(0);
+            TreeNode elseNode = null;
+            //Child Array Size determines if it is a CON(3 Childs) or a TIL(2 Childs)
+            if(actual.childs.size() > 2){
+                elseNode = actual.childs.get(2);
+            }
             
-        }else if(actual.operation.equals("til")){
+            //Se verifica el tipo de la condicion del CON si es funcion, id, etc...
+            switch( getOperationType( conditionNode ) ){
+                case 'o':
+                    this.typeErrors.add("Tipos incompatible: num no puede ser convertido a bin");
+                    break;
+                case 'b':
+                case 'e':
+                case 'c':
+                    this.operationTypeCheck(actual, 'b', table);
+                    break;
+                case 'l':
+                    if (! actual.type.equals("bin")) {
+                        this.typeErrors.add("Tipos incompatible: "+actual.type+" no puede ser convertido a bin");
+                    }
+                    break;
+                case 'i':
+                    TieSymbol localId = table.findSymbol(conditionNode.operation);
+                    if(localId != null){
+                        if(! localId.type.equals("bin")){
+                            this.typeErrors.add("Tipos incompatible: "+localId.type+" no puede ser convertido a bin");                        
+                        }
+                    }else{
+                        this.typeErrors.add("Variable "+ conditionNode.operation + " no esta declarada.");
+                    }
+                    break;
+                case 'f':
+                    String type = this.functiontypeCheck(actual, table);
+                    if (! type.equals("bin")) {
+                        this.typeErrors.add("Tipos incompatible: "+type+" no puede ser convertido a bin");
+                    }
+                    break;
+            }
+            
+            //Verificamos el cuerpo del CON este o no bien la condicion presentada
+            //Solo llamamos typeRun ya que dentro del cuerpo de con solo se ecnuentra un nodo de Statements
+            this.typeRun(actual.childs.get(1), actual.scope);
+        
+            //Si se presenta un nodo YET se verifica el cuerpo del else
+            if(elseNode != null && elseNode.operation.equals("yet")){
+                this.typeRun(elseNode.childs.get(0), elseNode.scope);
+            }
         }else if(actual.operation.equals("rep")){
+            this.typeRun(actual.childs.get(0), table);
+            this.typeRun(actual.childs.get(2), table);
+            switch( getOperationType(actual.childs.get(1)) ){
+                case 'o':
+                    this.typeErrors.add("Tipos incompatible: num no puede ser convertido a bin");
+                    break;
+                case 'b':
+                case 'e':
+                case 'c':
+                    this.operationTypeCheck(actual, 'b', table);
+                    break;
+                case 'l':
+                    if (! actual.type.equals("bin")) {
+                        this.typeErrors.add("Tipos incompatible: "+actual.type+" no puede ser convertido a bin");
+                    }
+                    break;
+                case 'i':
+                    TieSymbol localId = table.findSymbol(actual.operation);
+                    if(localId != null){
+                        if(! localId.type.equals("bin")){
+                            this.typeErrors.add("Tipos incompatible: "+localId.type+" no puede ser convertido a bin");                        
+                        }
+                    }else{
+                        this.typeErrors.add("Variable "+ actual.operation + " no esta declarada.");
+                    }
+                    break;
+                case 'f':
+                    String type = this.functiontypeCheck(actual, table);
+                    if (! type.equals("bin")) {
+                        this.typeErrors.add("Tipos incompatible: "+type+" no puede ser convertido a bin");
+                    }
+                    break;
+            }
+            this.typeRun(actual.childs.get(3), actual.scope);
         }else if(actual.operation.equals("set")){
-        }else if(actual.operation.equals("Call Function")){}
+            TreeNode definerNode = actual.childs.get(0);
+            TreeNode caseNodes = actual.childs.get(1);
+            if ( definerNode.type == null ) {
+                TieSymbol localId = table.findSymbol(definerNode.operation);
+                if(localId != null){
+                    if (! (localId.type.equals("sym") || localId.type.equals("num")) ) {
+                        this.typeErrors.add("Tipos incompatible: "+localId.type+" no puede ser convertido a bin");
+                    }
+                }else{
+                    this.typeErrors.add("Variable "+ definerNode.operation + " no esta declarada.");
+                }
+            }
+        }else if(actual.operation.equals("Call Function")){
+            this.functiontypeCheck(actual, table);  
+        }else{
+            System.out.println("Unknown type operation on tree: "+actual.operation);
+        }
     }
-    /*--------------------Type check for arithmetic operations--------------------*/
-    public String operationTypeCheck(TreeNode operation, SymbolTable table){
+    /*--------------------Type check for Operations--------------------*/
+    public String operationTypeCheck(TreeNode operation, char type, SymbolTable table){
+        System.out.println("Checking types on operation: "+operation.operation +" with operation char type: "+ type);
         TreeNode  left = operation.childs.get(0);
         TreeNode right = operation.childs.get(1);
-        char leftOperationType = getOperationType(left);
-        char rightOperationType = getOperationType(right);
         
-        String leftType = sideOperationType(leftOperationType, left, table);
-        String rightType = sideOperationType(rightOperationType, right, table);
+        System.out.println("Doing left side!");
+        String leftType = sideOperationType(left, table);
+        System.out.println("Doing right side!");
+        String rightType = sideOperationType(right, table);
         
-        if(leftType.equals(rightType))
-            return leftType;
-        else
-        {
-            this.typeErrors.add("Tipos incompatibles: " + leftType + " no puede ser convertido a " + rightType);
-            return "";
+        System.out.println("left side type -> "+leftType);
+        System.out.println("right side type -> "+rightType);
+        
+        
+        String finalType = "";
+        switch(type){
+            case 'o'://For arithmetic operations -> +, -, /, *
+            case 'c'://For comparison operations -> <, >, <=, >=
+                System.out.println("doing C operation types case?");
+                if( leftType.equals("num") && rightType.equals("num") ){
+                    finalType = leftType;
+                }else{
+                    this.typeErrors.add("Operandos tipo: "+leftType+" y "+rightType+" no se permite en la operation: "+operation.operation);
+                }
+                System.out.println("operation type o or c " + finalType );
+                break;
+            case 'b'://For boolean operations -> a``nd, or
+                if(leftType.equals("bin") && leftType.equals("bin")){
+                    finalType = leftType;
+                }else{
+                    this.typeErrors.add("Operandos tipo: "+leftType+" y "+rightType+" no se permite en operaciones booleanas");
+                }
+                System.out.println("operation type b "+ finalType);
+                break;
+            case 'e'://Equal operations -> ==, !=
+                if( (leftType.equals("num") && rightType.equals("num"))
+                    || (leftType.equals("bin") && rightType.equals("bin"))
+                    || (leftType.equals("char") && rightType.equals("char"))
+                ){
+                    finalType = leftType;
+                }else{
+                    this.typeErrors.add("Operandos tipo: "+leftType+" y "+rightType+" no se permiten en comparacion");
+                }
+                System.out.println("operation type e "+finalType);
+                break;
         }
-            
-        /*
-        if (operation.operation.equals("!")) {
-            return operationTypeCheck(operation.childs.get(0), table);
-        }
-        */
+        System.out.println("returning operation type from check "+ finalType);
+        //Maybe on error return nil?
+        return finalType;
+        
     }
     
     public char getOperationType(TreeNode sym)
     {
         if(sym.operation.equals("+")||sym.operation.equals("-")||sym.operation.equals("*")
-                ||sym.operation.equals("/"))
-        {
+                ||sym.operation.equals("/")){//Its an arithmetic operation
             return 'o';
-        }
-        else if(sym.type != null)
-        {
+        }else if(sym.operation.equals("and") || sym.operation.equals("or")){//Its a boolean operation
+            return 'b';
+        }else if( sym.operation.equals(">") || sym.operation.equals(">=") || sym.operation.equals("<")
+                || sym.operation.equals("<=") ){//Its a comparison function
+            return 'c';
+        }else if(sym.operation.equals("==") || sym.operation.equals("!=")){//Its an equality function
+            return 'e';
+        }else if(sym.type != null){//Its a Literal
             return 'l';
-        }
-        else if(sym.childs.size()==0)// It's an Id
-        {
+        }else if(sym.childs.size()==0){// It's an Id
             return 'i';
-        }
-        else// It's a call to function
-        {
+        }else{// It's a call to function
             return 'f';
         }
     }
     
-    public String sideOperationType(char leftOperationType, TreeNode node, SymbolTable table)
-    {
+    public String sideOperationType(TreeNode node, SymbolTable table){
         String finalType = "";
-        switch(leftOperationType)
-        {
+        char operationType = getOperationType(node);
+        switch( operationType ){
             case 'o':
-                finalType = operationTypeCheck(node, table);
+            case 'b':
+            case 'c':
+            case 'e':
+                finalType = operationTypeCheck(node, operationType, table);
                 break;
             case 'l':
                 finalType = node.type;
                 break;
             case 'i':
                 TieSymbol id = table.findSymbol(node.operation);
-                if(id != null)
+                if(id != null){
                     finalType = id.type;
-                else
-                {
+                }else{
                     finalType = "";
                     this.typeErrors.add("Variable "+ node.operation + " no esta declarada.");
                 }   
@@ -293,7 +423,7 @@ public class TieSemantics {
                     char forOperationType = getOperationType(temp);
                     switch(forOperationType){
                         case 'o':
-                            type = operationTypeCheck(temp, table);
+                            type = operationTypeCheck(temp, forOperationType, table);
                             break;
                         case 'i':
                             TieSymbol idTemp = table.findSymbol(temp.operation);
