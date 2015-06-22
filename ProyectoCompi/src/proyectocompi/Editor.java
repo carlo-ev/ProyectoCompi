@@ -360,6 +360,12 @@ public class Editor extends javax.swing.JFrame {
                 TieSemantics semanticCheck = new TieSemantics(parser.AST);
                 semanticCheck.typeCheck();
                 this.outputPane.append("> Successful Code Parsing! < \n");
+                
+                if(semanticCheck.typeErrors.isEmpty())
+                {
+                    IntermediateCode interCode = new IntermediateCode();
+                    interCode.traverseTree(parser.AST.childs.get(0));
+                }
             }
         }catch(Exception ex){
             System.out.println("Parser Crashed Unexpectedly"+ ex.toString() );

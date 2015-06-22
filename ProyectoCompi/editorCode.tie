@@ -1,6 +1,13 @@
 run
+num z = 1;
+bin c = false;
 
-num id;
-id = true;
+bin act funcion1(num a, bin b, num c)
+num x;
+x = 1 + 2 * 3;
+ret b;
+/act	
+
+funcion1(z,c, 4);
 
 /run	
