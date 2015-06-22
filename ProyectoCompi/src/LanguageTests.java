@@ -32,7 +32,7 @@ public class LanguageTests {
                 count++;
         }
         
-        System.out.println("la cantidad de numeros menores de 60 es: " + count);
+        System.out.println("La cantidad de numeros menores de 60 es: " + count);
     }
     
     static public void inverseString()

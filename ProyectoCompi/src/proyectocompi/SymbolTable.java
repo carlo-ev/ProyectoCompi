@@ -25,7 +25,6 @@ public class SymbolTable {
     }
     
     public TieSymbol findSymbol(String id){
-        System.out.println("Finding symbol");
         TieSymbol sym = null;
         for(TieSymbol temp : table){
             if( temp.id.equals(id) ){

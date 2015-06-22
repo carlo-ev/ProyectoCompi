@@ -2,6 +2,7 @@ run
 num z = 1;
 bin c = false;
 
+<<<<<<< HEAD
 bin act funcion1(num a, bin b, num c)
 num x;
 x = 1 + 2 * 3;
@@ -9,5 +10,15 @@ ret b;
 /act	
 
 funcion1(z,c, 4);
+=======
+con(id)
+/con
+
+num id;
+
+til(id)
+	id = true;
+/til
+>>>>>>> 57891f8e6927a91e960e242a1d1f9dd8c403ec3c
 
 /run	
