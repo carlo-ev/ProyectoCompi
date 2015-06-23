@@ -101,27 +101,21 @@ public class TieSemantics {
             actual.scope = repTable;
             declarationRun(actual.childs.get(3), repTable);
             System.out.println(table);
-            
         }else if(actual.operation.equals("act")){
             System.out.println("Act Declaration");
             String returnType = actual.type;
             String id = actual.childs.get(0).operation;
             String argumentString = "";
-            if(actual.childs.get(1).childs.size() > 0)
-            {
+            if(actual.childs.get(1).childs.size() > 0){
                 argumentString += actual.childs.get(1).childs.get(0).type;
                 for (int i = 1; i < actual.childs.get(1).childs.size() - 1; i++) {
                     argumentString += "X" + actual.childs.get(1).childs.get(i).type; 
-                }
-                 
+                }              
             }
             String functionSignature = argumentString+"->"+returnType;
-            if(table.findLocalSymbol(id)!=null)
-            {
+            if(table.findLocalSymbol(id)!=null){
                 this.typeErrors.add("Funcion "+ id + " ya ha sido declarada.");
-            }
-            else
-            {
+            }else{
                 table.addSymbol(id, functionSignature, 0);
                 SymbolTable functionTable = new SymbolTable();
                 functionTable.parentTable = table;
@@ -131,11 +125,22 @@ public class TieSemantics {
             System.out.println(table);
         }else if(actual.operation.equals("set")){
             System.out.println("Set Declaration");
-            for (int i = 0; i < actual.childs.get(1).childs.size() - 1; i++) {
+            
+            TreeNode casesNode = actual.childs.get(1);
+            for (int i = 0; i < casesNode.childs.size(); i++) {
                 SymbolTable optionTable = new SymbolTable();
                 optionTable.parentTable = table;
-                actual.childs.get(1).childs.get(i).scope = optionTable;
-                declarationRun( actual.childs.get(1).childs.get(i).childs.get(1), optionTable );
+                System.out.println("appending scope to case "+casesNode.childs.get(i).operation);
+                casesNode.childs.get(i).scope = optionTable;
+                declarationRun( casesNode.childs.get(i).childs.get(1), optionTable );
+            }
+            
+            TreeNode elseNode = actual.childs.get(2);
+            if (! elseNode.operation.isEmpty() ) {
+                SymbolTable anyTable = new SymbolTable();
+                anyTable.parentTable = table;
+                elseNode.scope = anyTable;
+                declarationRun( elseNode.childs.get(0), anyTable );
             }
             System.out.println(table);
         }else if(actual.operation.equals("Statements")){
@@ -161,7 +166,6 @@ public class TieSemantics {
             for (TreeNode statement : actual.childs) {
                 typeRun(statement, table);
             }
-            
         }else if (actual.operation.equals("=")) {//Chequeo para statement de asignacion
             //Verificando que la variable exista y qe los tipos de asignacion y variable concuerden
             TieSymbol id = table.findSymbol(actual.childs.get(0).operation);
@@ -215,18 +219,20 @@ public class TieSemantics {
             }
             
             //Se verifica el tipo de la condicion del CON si es funcion, id, etc...
-            switch( getOperationType( conditionNode ) ){
+            char conditionType = getOperationType( conditionNode );
+            switch( conditionType ){
                 case 'o':
-                    this.typeErrors.add("Tipos incompatible: num no puede ser convertido a bin");
+                    String operantType = this.operationTypeCheck(conditionNode, conditionType, table);
+                    this.typeErrors.add("Tipos incompatible: "+operantType+" no puede ser convertido a bin");
                     break;
                 case 'b':
                 case 'e':
                 case 'c':
-                    this.operationTypeCheck(actual, 'b', table);
+                    this.operationTypeCheck(actual, conditionType, table);
                     break;
                 case 'l':
-                    if (! actual.type.equals("bin")) {
-                        this.typeErrors.add("Tipos incompatible: "+actual.type+" no puede ser convertido a bin");
+                    if (! conditionNode.type.equals("bin")) {
+                        this.typeErrors.add("Tipos incompatible: "+conditionNode.type+" no puede ser convertido a bin");
                     }
                     break;
                 case 'i':
@@ -256,16 +262,29 @@ public class TieSemantics {
                 this.typeRun(elseNode.childs.get(0), elseNode.scope);
             }
         }else if(actual.operation.equals("rep")){
-            this.typeRun(actual.childs.get(0), table);
-            this.typeRun(actual.childs.get(2), table);
-            switch( getOperationType(actual.childs.get(1)) ){
+            TreeNode firstAssign = actual.childs.get(0);
+            TreeNode conditional = actual.childs.get(1);
+            TreeNode secondAssign = actual.childs.get(2);
+            //Verificamos condiciones de asiganacion dentro del REP
+            if (firstAssign.operation.equals("=")) {
+                this.typeRun(firstAssign, table);
+            }
+            //Siendo estas dos, la inicial y la que se repite luego de cada ciclo
+            if (secondAssign.operation.equals("=")) {
+                this.typeRun(secondAssign, table);
+            }
+            //Luego verificamos los tipos dentro de la condicion de enmedio del REP
+            //Condicion booleano
+            char midOperationType = getOperationType(conditional);
+            switch( midOperationType ){
                 case 'o':
-                    this.typeErrors.add("Tipos incompatible: num no puede ser convertido a bin");
+                    String operantType = this.operationTypeCheck(conditional, midOperationType, table);
+                    this.typeErrors.add("Tipos incompatible: "+operantType+" no puede ser convertido a bin");
                     break;
                 case 'b':
                 case 'e':
                 case 'c':
-                    this.operationTypeCheck(actual, 'b', table);
+                    this.operationTypeCheck(conditional, midOperationType, table);
                     break;
                 case 'l':
                     if (! actual.type.equals("bin")) {
@@ -273,38 +292,106 @@ public class TieSemantics {
                     }
                     break;
                 case 'i':
-                    TieSymbol localId = table.findSymbol(actual.operation);
+                    TieSymbol localId = table.findSymbol(conditional.operation);
                     if(localId != null){
                         if(! localId.type.equals("bin")){
                             this.typeErrors.add("Tipos incompatible: "+localId.type+" no puede ser convertido a bin");                        
                         }
                     }else{
-                        this.typeErrors.add("Variable "+ actual.operation + " no esta declarada.");
+                        this.typeErrors.add("Variable "+ conditional.operation + " no esta declarada.");
                     }
                     break;
                 case 'f':
-                    String type = this.functiontypeCheck(actual, table);
+                    String type = this.functiontypeCheck(conditional, table);
                     if (! type.equals("bin")) {
                         this.typeErrors.add("Tipos incompatible: "+type+" no puede ser convertido a bin");
                     }
                     break;
             }
+            //Luego continuamos con la validacion de tipos dentro del cuerpo del REP
             this.typeRun(actual.childs.get(3), actual.scope);
         }else if(actual.operation.equals("set")){
+            //Obtenemos los nodos de casos y definicion inicial
             TreeNode definerNode = actual.childs.get(0);
             TreeNode caseNodes = actual.childs.get(1);
+            TreeNode defaultNode = actual.childs.get(2);
+            
+            //Verificamos si es un literal o un id el nodo de decision inicial
             if ( definerNode.type == null ) {
                 TieSymbol localId = table.findSymbol(definerNode.operation);
                 if(localId != null){
+                    //Verificamos si es SYM o NUM ya que solo esos tipos se pueden en un SET
                     if (! (localId.type.equals("sym") || localId.type.equals("num")) ) {
-                        this.typeErrors.add("Tipos incompatible: "+localId.type+" no puede ser convertido a bin");
+                        this.typeErrors.add("Tipos incompatible: Se permite sym o num, tipo encontrado: "+localId.type);
                     }
                 }else{
                     this.typeErrors.add("Variable "+ definerNode.operation + " no esta declarada.");
                 }
             }
+            
+            //Verificamos los casos y los valores de decision dentro de los casos
+            for(TreeNode oneCase : caseNodes.childs){
+                TreeNode definerCaseNode = oneCase.childs.get(0);
+                //Check the type for an id that defines the case
+                if (! (definerCaseNode.type != null) ) {
+                    TieSymbol caseId = table.findSymbol(definerCaseNode.operation);
+                    if (caseId != null) {
+                        if (! (caseId.type.equals("sym") || caseId.type.equals("num")) ) {
+                            this.typeErrors.add("Tipos incompatible: "+caseId.type+" no puede ser convertido a bin");
+                        }
+                    }
+                }
+                //We check type for the body of the case
+                this.typeRun(oneCase.childs.get(1), oneCase.scope);
+            }
+            
+            //If there is an ANY case then check type for its body
+            if (! defaultNode.operation.isEmpty() ) {
+                this.typeRun(defaultNode.childs.get(0), defaultNode.scope);
+            }
         }else if(actual.operation.equals("Call Function")){
             this.functiontypeCheck(actual, table);  
+        }else if(actual.operation.equals("act")){
+            TreeNode returnNode = actual.childs.get(3);
+            
+            this.typeRun(actual.childs.get(2), actual.scope);
+            
+            if (! returnNode.operation.isEmpty()) {
+                char returnOperationType = this.getOperationType(returnNode.childs.get(0));
+                switch( returnOperationType ){
+                    case 'o':
+                        String operantType = this.operationTypeCheck(returnNode.childs.get(0), returnOperationType, actual.scope);
+                        if(!actual.type.equals(operantType)){
+                            this.typeErrors.add("Tipos incompatible: "+operantType+" no puede ser convertido a "+actual.type);
+                        }
+                        break;
+                    case 'b':
+                    case 'c':
+                    case 'l':
+                    case 'e':
+                        if(!actual.type.equals("bin")){
+                            this.typeErrors.add("Tipos incompatible: bin no puede ser convertido a "+actual.type);
+                        }
+                        this.operationTypeCheck(returnNode.childs.get(0), returnOperationType, actual.scope);
+                        break;
+                    case 'i':
+                        TieSymbol returnId = table.findSymbol(returnNode.childs.get(0).operation);
+                        if(returnId != null){
+                            if(! returnId.type.equals(actual.type)){
+                                this.typeErrors.add("Tipos incompatible: "+returnId.type+" no puede ser convertido a "+actual.type);                        
+                            }
+                        }else{
+                            this.typeErrors.add("Variable "+ returnNode.childs.get(0).operation + " no esta declarada.");
+                        }
+                        break;
+                    case 'f':
+                        String type = this.functiontypeCheck(returnNode.childs.get(0), actual.scope);
+                        if (! type.equals(actual.type)) {
+                            this.typeErrors.add("Tipos incompatible: "+type+" no puede ser convertido a "+actual.type);
+                        }
+                        break;
+                }
+            }
         }else{
             System.out.println("Unknown type operation on tree: "+actual.operation);
         }
@@ -315,9 +402,7 @@ public class TieSemantics {
         TreeNode  left = operation.childs.get(0);
         TreeNode right = operation.childs.get(1);
         
-        System.out.println("Doing left side!");
         String leftType = sideOperationType(left, table);
-        System.out.println("Doing right side!");
         String rightType = sideOperationType(right, table);
         
         System.out.println("left side type -> "+leftType);
@@ -328,13 +413,11 @@ public class TieSemantics {
         switch(type){
             case 'o'://For arithmetic operations -> +, -, /, *
             case 'c'://For comparison operations -> <, >, <=, >=
-                System.out.println("doing C operation types case?");
-                if( leftType.equals("num") && rightType.equals("num") ){
+                if( (leftType.equals("num") && rightType.equals("num")) || (leftType.equals("dec") || rightType.equals("dec")) ){
                     finalType = leftType;
                 }else{
                     this.typeErrors.add("Operandos tipo: "+leftType+" y "+rightType+" no se permite en la operation: "+operation.operation);
                 }
-                System.out.println("operation type o or c " + finalType );
                 break;
             case 'b'://For boolean operations -> a``nd, or
                 if(leftType.equals("bin") && leftType.equals("bin")){
@@ -342,21 +425,19 @@ public class TieSemantics {
                 }else{
                     this.typeErrors.add("Operandos tipo: "+leftType+" y "+rightType+" no se permite en operaciones booleanas");
                 }
-                System.out.println("operation type b "+ finalType);
                 break;
             case 'e'://Equal operations -> ==, !=
                 if( (leftType.equals("num") && rightType.equals("num"))
                     || (leftType.equals("bin") && rightType.equals("bin"))
                     || (leftType.equals("char") && rightType.equals("char"))
+                    || (leftType.equals("dec") && rightType.equals("dec"))
                 ){
                     finalType = leftType;
                 }else{
                     this.typeErrors.add("Operandos tipo: "+leftType+" y "+rightType+" no se permiten en comparacion");
                 }
-                System.out.println("operation type e "+finalType);
                 break;
         }
-        System.out.println("returning operation type from check "+ finalType);
         //Maybe on error return nil?
         return finalType;
         

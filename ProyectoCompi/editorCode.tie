@@ -1,12 +1,15 @@
 run
 
-con(id)
+bin boolean = false;
+
+con()
 /con
 
-num id;
+til(false)
 
-til(id)
-	id = true;
-/til
+
+num numero = 12;
+
+bon algo
 
 /run	

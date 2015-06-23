@@ -65,7 +65,7 @@ public class SymbolTable {
     }
  
     public String toString(){
-        String tableString =  "-> Symbol Table <-\n";
+        String tableString =  "-> Symbol Table"+table.size()+" <-\n";
         for(TieSymbol row : table){
             tableString += row.toString() + "\n";
         }

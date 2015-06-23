@@ -174,7 +174,9 @@ start with PROGRAM;
 //----------- Statement ID or Function Disambiguation
 
     CALL_FUNCTION ::= ID:id PARIZQ PARAMS:p PARDER END                          {: RESULT = new TreeNode("Call Function", id, p); :}
-        | ID:id ASSIGN:a E:e END                                                {: RESULT = new TreeNode("=", new TreeNode(id), e); :};
+        | ID:id ASSIGN:a E:e END                                                {: RESULT = new TreeNode("=", new TreeNode(id), e); :}
+        | ID error                                                              {: parser.report_error("Error in ID operation statement", ""); :}
+        ;
 
 //----------- Statement ID or Function End
 
@@ -205,6 +207,7 @@ start with PROGRAM;
         ;
     DECLARE_FUNCTION ::= FUNCTION_TYPES:t ACT:act ID:id PARIZQ ARGUMENTS:args PARDER PROGRAM_BODY:body RETURN:r ACTEND 
                                                                                 {: RESULT = new TreeNode("act", t, new TreeNode(id, "act"), args, body, r); :}
+        | FUNCTION_TYPES ACT error                                               {: parser.report_error("Error in ACT body statement", ""); :}
         ;
 
 //----------- FUNCTION DECLARATION END
@@ -213,6 +216,7 @@ start with PROGRAM;
 //----------- _WHILE
 
     _WHILE ::= TIL:til PARIZQ LogicalA:la PARDER PROGRAM_BODY:body TILEND       {: RESULT = new TreeNode("til", la, body); :}
+        | TIL error                                                             {: parser.report_error("Error in TIL statement", ""); :}
         ;
 
 //----------- _WHILE END
@@ -225,14 +229,18 @@ start with PROGRAM;
         | ID:id                                                                 {: RESULT = new TreeNode(id); :}
         ;
     DEFAULT ::= ANY:any PROGRAM_BODY:body ANYEND                                {: RESULT = new TreeNode("any", body); :}
+        | ANY error                                                             {: parser.report_error("Error in ANY statement", ""); :}
         |                                                                       {: RESULT = new TreeNode(""); :}
         ;
     CASE ::= CASE:c OPT:opt PARIZQ SWITCH_LITERALS:sl PARDER PROGRAM_BODY:b OPTEND  
                                                                                 {: ((TreeNode)c).addChild( new TreeNode("opt", sl, b) ); RESULT = c; :}
-        |                                                                       {:RESULT = new TreeNode("CASES"); :}
+        | CASE OPT error                                                        {: parser.report_error("Error in SET CASE statement", ""); :}
+        |                                                                       {: RESULT = new TreeNode("CASES"); :}
         ;
     _SWITCH ::= SET:set PARIZQ SWITCH_LITERALS:sl PARDER CASE:c DEFAULT:d SETEND 
-                                                                                {: RESULT = new TreeNode("set", sl, c, d); :};
+                                                                                {: RESULT = new TreeNode("set", sl, c, d); :}
+        | SET error                                                             {: parser.report_error("Error in SET statement", ""); :}
+        ;
 
 //----------- _SWITCH END
 
@@ -244,6 +252,7 @@ start with PROGRAM;
         ;
     _FOR ::= REP:rep PARIZQ FOR_ASSIGN:fa END LogicalA:la END FOR_ASSIGN:fa2 PARDER PROGRAM_BODY:body REPEND 
                                                                                 {: RESULT = new TreeNode("rep", fa, la, fa2, body); :}
+        | REP error                                                             {: parser.report_error("Error in REP statement", ""); :}
         ; 
 
 //----------- _FOR END
@@ -252,10 +261,12 @@ start with PROGRAM;
 //----------- _IF _ELSE
 
     _ELSE ::= YET:yet PROGRAM_BODY:body YETEND                                  {: RESULT = new TreeNode("yet", body); :}
+        | YET error                                                             {: parser.report_error("Error in YET statement", ""); :}
         |                                                                       {: RESULT = new TreeNode(""); :}
         ;
     _IF ::= COND:cond PARIZQ LogicalA:la PARDER PROGRAM_BODY:body CONDEND _ELSE:_else
                                                                                 {: RESULT = new TreeNode("con", la, body, _else); :}
+        | COND error                                                            {: parser.report_error("Error in CON statement", ""); :}
         ;
 
 //----------- _IF _ELSE END
@@ -286,7 +297,6 @@ start with PROGRAM;
 
     STATEMENTS ::= STATEMENTS:statements STATEMENT:statement                    {: ((TreeNode)statements).addChild(statement); RESULT = statements; :}
         | STATEMENT:statement                                                   {: RESULT = new TreeNode("Statements", statement); :}
-        | error                                                                 {: parser.report_error("Error in a Statement", ""); :}
         ; 
 
     PROGRAM_BODY ::= STATEMENTS:statements                                      {: RESULT = statements; :}

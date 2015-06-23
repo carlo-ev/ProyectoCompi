@@ -11,12 +11,7 @@
 public class LanguageTests {
 
     public static void main(String[] args) {
-        Boolean id = false;
-        if (id) {
-            int a;
-        }else{
-            int a;
-        }
+        
     }
     
 }
