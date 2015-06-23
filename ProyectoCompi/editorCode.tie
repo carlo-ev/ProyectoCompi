@@ -1,8 +1,23 @@
 run
+num z = 1;
+bin c = false;
 
+<<<<<<< HEAD
 bin boolean = false;
 
 con()
+=======
+<<<<<<< HEAD
+bin act funcion1(num a, bin b, num c)
+num x;
+x = 1 + 2 * 3;
+ret b;
+/act	
+
+funcion1(z,c, 4);
+=======
+con(id)
+>>>>>>> ca41c4b69fa5061c8ca43132e90e683340334948
 /con
 
 til(false)
@@ -10,6 +25,13 @@ til(false)
 
 num numero = 12;
 
+<<<<<<< HEAD
 bon algo
+=======
+til(id)
+	id = true;
+/til
+>>>>>>> 57891f8e6927a91e960e242a1d1f9dd8c403ec3c
+>>>>>>> ca41c4b69fa5061c8ca43132e90e683340334948
 
 /run	

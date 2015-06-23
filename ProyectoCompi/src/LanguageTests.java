@@ -8,10 +8,8 @@
  *
  * @author carlo
  */
-public class LanguageTests {
 
+public class LanguageTests {
     public static void main(String[] args) {
-        
     }
-    
 }

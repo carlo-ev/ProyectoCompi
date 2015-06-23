@@ -295,7 +295,8 @@ start with PROGRAM;
         | CALL_FUNCTION:callfunction                                            {: RESULT = callfunction; :}
         ;
 
-    STATEMENTS ::= STATEMENTS:statements STATEMENT:statement                    {: ((TreeNode)statements).addChild(statement); RESULT = statements; :}
+    STATEMENTS ::= STATEMENTS:statements STATEMENT:statement                    {:if(!(statement == null))
+                                                                                {((TreeNode)statements).addChild(statement); RESULT = statements;} :}
         | STATEMENT:statement                                                   {: RESULT = new TreeNode("Statements", statement); :}
         ; 
 
