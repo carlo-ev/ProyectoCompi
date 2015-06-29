@@ -1,6 +1,10 @@
 run
 
+<<<<<<< HEAD
 bin sisi;
+=======
+con(c < d or true or true and a < b)
+>>>>>>> 846b0531a750b7372438da2cba72b6e17d90c6ba
 
 bin act funcion(num id, num t2, dec aja, bin esto)
 	num nuevo = 12;

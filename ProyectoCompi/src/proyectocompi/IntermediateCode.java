@@ -17,6 +17,7 @@ public class IntermediateCode {
     public ArrayList<IntermediateNode> interTable = new ArrayList();
     private int tempCount = 0;
     private final Pattern operators = Pattern.compile("\\+|\\-|\\*|\\/|\\%");
+    private final Pattern logicalOperators = Pattern.compile("\\==|\\>|\\<|\\>=|\\<=\\!=");
     
     final String con = "if";
     final String til = "while";
@@ -269,11 +270,26 @@ public class IntermediateCode {
         TreeNode left = statement.childs.get(0);
         TreeNode right = statement.childs.get(1);
         String concatArg = statement.operation;
+        boolean runRight = true;
         
-        if(!(left.operation.equals("and") || left.operation.equals("or")))
+        
+        if(!(left.operation.equals("and") || left.operation.equals("or") || left.operation.equals("false") || left.operation.equals("true")))
             concatCount = genLogicalTags(left, concatArg, concatCount);
         
-        concatCount = genLogicalTags(right, concatArg, concatCount);
+        if(left.operation.equals("true") || left.operation.equals("false"))
+        {
+            runRight = false;
+            concatCount = genLogicalTags(left, concatArg, concatCount);
+        }
+            
+        if(right.operation.equals("true") || right.operation.equals("false"))
+        {
+            runRight = false;
+            concatCount = genLogicalTags(right, concatArg, concatCount);
+        }
+        
+        if(runRight)
+            concatCount = genLogicalTags(right, concatArg, concatCount);
         
         return concatCount;
         
@@ -281,9 +297,8 @@ public class IntermediateCode {
     
     public int genLogicalTags(TreeNode logicalStatement, String concatArg ,int concatCount)
     {
+        System.out.println("\nGEN LOGICAL TAGS\n");
         IntermediateNode interNode;
-        TreeNode left = logicalStatement.childs.get(0);
-        TreeNode right = logicalStatement.childs.get(1);
         String tag;
         String logOp;
         
@@ -301,10 +316,17 @@ public class IntermediateCode {
             argCount++;
             if(concatCount != 0)
             {
-                if(nextOr.isEmpty())
+                if(concatSize!=concatCount)
+                {
+                    if(nextOr.isEmpty())
                     tag = "goto " + argTag + argCount +  ", " + "goto " + falseTag + logResCount;
+                    else
+                        tag = "goto " + argTag + argCount +  ", " + "goto " + nextOr;
+                }
+                
                 else
-                    tag = "goto " + nextOr +  ", " + "goto " + nextOr;
+                    tag = "goto " + argTag + argCount +  ", " + "goto " + nextOr;
+                
             }
 
             else
@@ -323,10 +345,16 @@ public class IntermediateCode {
             argCount++;
             if(concatCount != 0)
                 {
-                    if(nextAnd.isEmpty())
+                    if(concatSize != concatCount)
+                    {
+                        if(nextAnd.isEmpty())
                         tag = "goto " + trueTag + logResCount + ", " + "goto " + argTag + argCount;
                     else
-                        tag = "goto " + nextAnd + ", " + "goto " + nextAnd;
+                        tag = "goto " + nextAnd + ", " + "goto " + argTag + argCount;
+                    }
+                    
+                    else
+                        tag = "goto " + nextAnd + ", " + "goto " + argTag + argCount;
                     
                 }
 
@@ -343,8 +371,48 @@ public class IntermediateCode {
         else
             argCount++;
         
-        interNode = new IntermediateNode(logOp, left.operation, right.operation, tag);
-        interTable.add(interNode);
+        String jumpTag[] = tag.split(",");
+        if(!logicalStatement.childs.isEmpty())
+        {
+            TreeNode left = logicalStatement.childs.get(0);
+            TreeNode right = logicalStatement.childs.get(1);
+            interNode = new IntermediateNode(logOp, left.operation, right.operation, jumpTag[0]);
+            interTable.add(interNode);
+            interNode = new IntermediateNode(jumpTag[1].substring(1), "", "", "");
+            interTable.add(interNode);
+        }
+        
+        else
+        {
+            
+            if(logicalStatement.operation.equals("true"))
+            {
+                tempCount++;
+                interNode = new IntermediateNode("=", logicalStatement.operation, "", "t" + tempCount);
+                interTable.add(interNode);
+                
+                interNode = new IntermediateNode(jumpTag[0], "", "", "");
+                interTable.add(interNode);
+            }
+            else if(logicalStatement.operation.equals("false"))
+            {
+                tempCount++;
+                interNode = new IntermediateNode("=", logicalStatement.operation, "", "t" + tempCount);
+                interTable.add(interNode);
+                
+                interNode = new IntermediateNode(jumpTag[1].substring(1), "", "", "");
+                interTable.add(interNode);
+            }
+            
+            else if(!(logicalStatement.operation.equals("true") || logicalStatement.operation.equals("false")))
+            {
+                interNode = new IntermediateNode("if=", logicalStatement.operation, "true", jumpTag[0]);
+                interTable.add(interNode);
+                interNode = new IntermediateNode(jumpTag[1].substring(1), "", "", "");
+                interTable.add(interNode);
+            }
+        }
+        
         concatCount--;
         return concatCount;
     }
@@ -413,6 +481,7 @@ public class IntermediateCode {
             String tagTempFalse;
             IntermediateNode interNode;
             TreeNode currentStatement;
+            currentStatement = statement.childs.get(i);
             optCount++;
             optTot--;
             String tagTempTrue = "true" + opt + optCount;
@@ -429,20 +498,22 @@ public class IntermediateCode {
 
             interNode = new IntermediateNode(opt + optCount, "", "", "");
             interTable.add(interNode);
-            currentStatement = statement.childs.get(0);// Get option/case argument.
+            TreeNode caseVal = currentStatement.childs.get(0);// Get option/case argument.
             tempCount++;
             String tempOptArg = "t" + tempCount;
-            interNode = new IntermediateNode("=", currentStatement.operation, "", "t" + tempCount);
+            interNode = new IntermediateNode("=", caseVal.operation, "", "t" + tempCount);
             interTable.add(interNode);
 
-            interNode = new IntermediateNode("if=", setArg, tempOptArg, "goto " + tagTempTrue + ", goto " + tagTempFalse);
+            interNode = new IntermediateNode("if=", setArg, tempOptArg, "goto " + tagTempTrue);
             interTable.add(interNode);
-
+            interNode = new IntermediateNode("goto " + tagTempFalse, "", "", "");
+            interTable.add(interNode);
+            
             interNode = new IntermediateNode(tagTempTrue, "", "", "");
             interTable.add(interNode);
 
-            currentStatement = statement.childs.get(1);// Option/Case body.
-            traverseTree(currentStatement);
+            TreeNode caseBody = currentStatement.childs.get(1);// Option/Case body.
+            traverseTree(caseBody);
             
             interNode = new IntermediateNode("goto " + set + "False" + setCount , "", "", "");
             interTable.add(interNode);
