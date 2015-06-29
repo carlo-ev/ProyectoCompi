@@ -414,6 +414,7 @@ public class Editor extends javax.swing.JFrame {
                     IntermediateCode interCode = new IntermediateCode();
                     interCode.traverseTree(parser.AST.childs.get(0));
                     this.tabs.setEnabledAt(2, true);
+                    this.intermediateTextArea.setText("");
                     for(IntermediateNode line : interCode.interTable){
                         this.intermediateTextArea.append( 
                                 line.operator + "  " + line.operandum1 + "  " + line.operandum2 + "  " + line.result + "\n"

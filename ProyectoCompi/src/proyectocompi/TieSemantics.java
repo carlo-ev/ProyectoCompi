@@ -19,6 +19,8 @@ public class TieSemantics {
     public ArrayList<String> typeErrors;
     public ArrayList<String> declarationErrors;
     public JTextArea outputPane;
+    public boolean inFunction;
+    public int functionTypeCount;
     
     public TieSemantics(){}
     
@@ -32,7 +34,12 @@ public class TieSemantics {
     
     public void typeCheck(){
         SymbolTable inicial = new SymbolTable();
+        //inicial.addSymbol("put", "str->nil", 0, 0);
         this.declarationErrors = new ArrayList();
+        this.typeErrors = new ArrayList();  
+        
+        this.inFunction = false;
+        this.functionTypeCount = 0;
         
         declarationRun(this.parseTree, inicial);
         
@@ -42,7 +49,6 @@ public class TieSemantics {
                 this.outputPane.append(line + "\n");
             }
         }else{
-            this.typeErrors = new ArrayList();    
             typeRun(this.parseTree, inicial);
             if (this.typeErrors.size() > 0 ) {
                 this.outputPane.append("> Type Errors <\n");
@@ -63,6 +69,7 @@ public class TieSemantics {
         
         if( actual.operation.equals("Declare ID") ){
             System.out.println("Declaring a variable");
+            
             if (actual.childs.get(0).operation.equals("=")) {
                 System.out.println("declaring variable with value");
                 TreeNode equalsNode = actual.childs.get(0);
@@ -70,15 +77,21 @@ public class TieSemantics {
                 if (table.findLocalSymbol(idNode.operation) != null) {
                     this.declarationErrors.add("Variable "+ idNode.operation + " ya esta declarada.");
                 }else{
-                    table.addSymbol(idNode.operation , actual.type, 0);
+                    if (inFunction) {
+                        this.functionTypeCount += this.getTypeSize(idNode.operation);
+                    }
+                    table.addSymbol(idNode.operation , actual.type, 0, this.functionTypeCount);
                 }
             }else{
                 System.out.println("declaring variable array with no value");
+                if (inFunction) {
+                    this.functionTypeCount += this.getTypeSize(actual.type);
+                }
                 for (TreeNode child : actual.childs) {
                     if (table.findLocalSymbol(child.operation) != null) {
                         this.declarationErrors.add("Variable "+ child.operation + " ya esta declarada.");
-                    }else{
-                        table.addSymbol(child.operation, actual.type, 0);
+                    }else{        
+                        table.addSymbol(child.operation, actual.type, 0, this.functionTypeCount);
                     }
                 }
             }
@@ -116,21 +129,40 @@ public class TieSemantics {
             String returnType = actual.type;
             String id = actual.childs.get(0).operation;
             String argumentString = "";
+            ArrayList<TreeNode> argumentList = new ArrayList();
             if(actual.childs.get(1).childs.size() > 0){
                 argumentString += actual.childs.get(1).childs.get(0).type;
-                for (int i = 1; i < actual.childs.get(1).childs.size() - 1; i++) {
-                    argumentString += "X" + actual.childs.get(1).childs.get(i).type; 
+                argumentList.add(actual.childs.get(1).childs.get(0));
+                for (int i = 1; i < actual.childs.get(1).childs.size(); i++) {
+                    argumentString += "X" + actual.childs.get(1).childs.get(i).type;
+                    argumentList.add(actual.childs.get(1).childs.get(i));
                 }              
             }
             String functionSignature = argumentString+"->"+returnType;
             if(table.findLocalSymbol(id)!=null){
-                this.typeErrors.add("Funcion "+ id + " ya ha sido declarada.");
+                this.declarationErrors.add("Funcion "+ id + " ya ha sido declarada.");
             }else{
                 table.addSymbol(id, functionSignature, 0);
                 SymbolTable functionTable = new SymbolTable();
+                for(TreeNode tempNode : argumentList){
+                    functionTable.addSymbol(tempNode.operation, tempNode.type, 0);
+                }
+                System.out.println(functionTable);
                 functionTable.parentTable = table;
                 actual.scope = functionTable;
+                
+                boolean pastFunctionState = this.inFunction;
+                int pastFunctionCount = this.functionTypeCount;
+                this.inFunction = true;
+                this.functionTypeCount = 0;
                 declarationRun(actual.childs.get(2), functionTable);
+                this.inFunction = pastFunctionState;
+                this.functionTypeCount = pastFunctionCount;
+            }
+            if (!returnType.equals("nil") && actual.childs.get(3).operation.isEmpty()) {
+                this.declarationErrors.add("Valor de retorno faltante en la funcion: "+ id );
+            }else if(returnType.equals("nill") && !actual.childs.get(3).operation.isEmpty() ){
+                this.declarationErrors.add("Funcion "+id+" tipo nil tiene valor de retorno");
             }
             System.out.println(table);
         }else if(actual.operation.equals("set")){
@@ -207,7 +239,7 @@ public class TieSemantics {
                         }
                         break;
                     case 'f':
-                        rightType = functiontypeCheck(actual, table);
+                        rightType = functiontypeCheck(rightOperation, table);
                         break;
                 }
                 
@@ -360,7 +392,7 @@ public class TieSemantics {
                 this.typeRun(defaultNode.childs.get(0), defaultNode.scope);
             }
         }else if(actual.operation.equals("Call Function")){
-            this.functiontypeCheck(actual, table);  
+            this.functiontypeCheck(actual.childs.get(0), table);  
         }else if(actual.operation.equals("act")){
             TreeNode returnNode = actual.childs.get(3);
             
@@ -377,15 +409,19 @@ public class TieSemantics {
                         break;
                     case 'b':
                     case 'c':
-                    case 'l':
                     case 'e':
                         if(!actual.type.equals("bin")){
                             this.typeErrors.add("Tipos incompatible: bin no puede ser convertido a "+actual.type);
                         }
                         this.operationTypeCheck(returnNode.childs.get(0), returnOperationType, actual.scope);
                         break;
+                    case 'l':
+                        if ( !actual.type.equals(returnNode.childs.get(0).type) ) {
+                            this.typeErrors.add("Tipos incompatible: "+returnNode.childs.get(0).type+" no puede ser convertido a "+actual.type);
+                        }
+                        break;
                     case 'i':
-                        TieSymbol returnId = table.findSymbol(returnNode.childs.get(0).operation);
+                        TieSymbol returnId = actual.scope.findSymbol(returnNode.childs.get(0).operation);
                         if(returnId != null){
                             if(! returnId.type.equals(actual.type)){
                                 this.typeErrors.add("Tipos incompatible: "+returnId.type+" no puede ser convertido a "+actual.type);                        
@@ -474,6 +510,20 @@ public class TieSemantics {
         }
     }
     
+    public int getTypeSize(String type){
+        if (type.equals("num")) {
+            return 4;
+        }else if (type.equals("bin")){
+            return 1;
+        }else if (type.equals("dec")){
+            return 4;
+        }else if (type.equals("sym")){
+            return 1;
+        }else{
+            return 0;
+        }
+    }
+    
     public String sideOperationType(TreeNode node, SymbolTable table){
         String finalType = "";
         char operationType = getOperationType(node);
@@ -532,7 +582,7 @@ public class TieSemantics {
                 }
                 firm = firm.substring(0, firm.length()-1);
                 if (!functionFirmSplit[0].equals(firm)) {
-                    typeErrors.add("Tipos de Argumentos invalidos se esperaba "+functionFirmSplit[0]+" en lugar de "+firm );
+                    typeErrors.add(functionId.id+": Tipos de Argumentos invalidos se esperaba "+functionFirmSplit[0]+" en lugar de "+firm );
                     return "";
                 }else{
                     return functionFirmSplit[1];
@@ -541,12 +591,12 @@ public class TieSemantics {
                 if(functionFirmSplit[0].isEmpty()) {
                     return functionFirmSplit[1];
                 }else{
-                    typeErrors.add("Tipos de Argumentos invalidos se esperaba "+functionFirmSplit[0] );
+                    typeErrors.add(functionId.id+": Tipos de Argumentos invalidos se esperaba "+functionFirmSplit[0] );
                     return "";
                 }
             }
         }else{
-            this.typeErrors.add("Function "+ functionNode.operation + " no esta declarada.");
+            this.typeErrors.add("Funcion "+ functionNode.operation + " no esta declarada.");
             return "";
         }
     }

@@ -86,7 +86,6 @@ plus = \+
 minus = \-
 mult = \*
 div = \/
-mod = \%
 
 //Logic Operators
 and = and
@@ -97,7 +96,6 @@ lessEqualThan = <=
 greaterEqualThan = ">="
 equal = (==)
 unEqual = (\!=)
-not = [!]
 
 //General Operators
 this = @
@@ -156,7 +154,6 @@ braketDer = \]
 	{minus}				{return symbol(sym.MINUS);}
 	{mult}				{return symbol(sym.MULT);}
 	{div}				{return symbol(sym.DIV);}
-	{mod}				{return symbol(sym.MOD);}
 
 	{and}				{return symbol(sym.AND);}
 	{or}				{return symbol(sym.OR);}
@@ -166,7 +163,6 @@ braketDer = \]
 	{greaterEqualThan}              {return symbol(sym.GREATEREQUALTHAN);}
 	{equal}				{return symbol(sym.EQUAL);}
 	{unEqual}			{return symbol(sym.NOTEQUAL);}
-	{not}				{return symbol(sym.NOT);}
 
 	{comma}				{return symbol(sym.COMMA);}
         {parIzq}			{return symbol(sym.PARIZQ);}

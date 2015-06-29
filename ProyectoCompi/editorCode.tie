@@ -1,12 +1,25 @@
 run
 
-	num id = 123;
+bin sisi;
 
-	con( true and false)
-	/con
+bin act funcion(num id, num t2, dec aja, bin esto)
+	num nuevo = 12;
+	num esto2;
+	bin tambien;
+	dec perro;
+	t2 = 12;
+	id = 12;
+	esto = false;
+	ret esto;
+/act
 
-	rep(id = 0; id < 10; id = id + 10)
-		bin cierto = false;
-	/rep
+sisi = funcion(12, 123124, 1.23, true);
+
+nil act print(str mjm)
+ bin buenobueno = false;
+/act
+
+str string;
+print(string);
 
 /run	
