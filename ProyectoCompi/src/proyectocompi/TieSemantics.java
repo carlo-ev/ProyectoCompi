@@ -6,6 +6,7 @@
 package proyectocompi;
 
 import java.util.ArrayList;
+import javax.swing.JTextArea;
 
 /**
  *
@@ -17,6 +18,7 @@ public class TieSemantics {
     private SymbolTable symbolTable;
     public ArrayList<String> typeErrors;
     public ArrayList<String> declarationErrors;
+    public JTextArea outputPane;
     
     public TieSemantics(){}
     
@@ -35,11 +37,19 @@ public class TieSemantics {
         declarationRun(this.parseTree, inicial);
         
         if (this.declarationErrors.size() > 0) {
-            System.out.println(this.declarationErrors);
+            this.outputPane.append("> Variable Declaration Errors <\n");
+            for(String line : this.declarationErrors){
+                this.outputPane.append(line + "\n");
+            }
         }else{
             this.typeErrors = new ArrayList();    
             typeRun(this.parseTree, inicial);
-            System.out.println(this.typeErrors);
+            if (this.typeErrors.size() > 0 ) {
+                this.outputPane.append("> Type Errors <\n");
+                for(String line : this.typeErrors){
+                    this.outputPane.append(line + "\n");
+                }
+            }
         }
         
         
@@ -228,7 +238,7 @@ public class TieSemantics {
                 case 'b':
                 case 'e':
                 case 'c':
-                    this.operationTypeCheck(actual, conditionType, table);
+                    this.operationTypeCheck(conditionNode, conditionType, table);
                     break;
                 case 'l':
                     if (! conditionNode.type.equals("bin")) {
@@ -420,7 +430,7 @@ public class TieSemantics {
                 }
                 break;
             case 'b'://For boolean operations -> a``nd, or
-                if(leftType.equals("bin") && leftType.equals("bin")){
+                if(leftType.equals("bin") && rightType.equals("bin")){
                     finalType = leftType;
                 }else{
                     this.typeErrors.add("Operandos tipo: "+leftType+" y "+rightType+" no se permite en operaciones booleanas");
