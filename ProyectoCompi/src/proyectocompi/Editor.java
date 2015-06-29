@@ -109,11 +109,14 @@ public class Editor extends javax.swing.JFrame {
         
         //Editor Shortcuts
         shortcuts.put("run", "\n\n\n\n/run");
-        shortcuts.put("rep", "(num i=0;i<10;i=i+1)\n\n/rep");
-        shortcuts.put("set", "(id)\nopt 1\n\n/opt\n\n/set");
-        shortcuts.put("act", " funcion1()\n\n/act");
+        shortcuts.put("rep", "(i=0;i<10;i=i+1)\n\n/rep");
+        shortcuts.put("set", "(id)\nopt (1)\n\n/opt\n\n/set");
+        shortcuts.put("nil", " act funcion1()\n\n/act");
         shortcuts.put("#*", "\n\n*#");
         shortcuts.put("con", "(true)\n\n/con");
+        shortcuts.put("til", "(true)\n\n/til");
+        shortcuts.put("yet", "\n\n/yet");
+        
     }
     
     public static String getExtension(File f) {
@@ -377,7 +380,6 @@ public class Editor extends javax.swing.JFrame {
         TieLexer lexer;
         try{
             lexer = new TieLexer(this.currentFileManager.getCurrentFile());
-            //lexer.setOutputArea(this.outputPane);
             this.outputPane.setText("");
             TieParser parser = new TieParser(lexer);
             parser.setOutput(this.outputPane);
@@ -388,9 +390,8 @@ public class Editor extends javax.swing.JFrame {
                 TieSemantics semanticCheck = new TieSemantics(parser.AST);
                 semanticCheck.typeCheck();
                 this.outputPane.append("> Successful Code Parsing! < \n");
-                
-                if(semanticCheck.typeErrors.isEmpty())
-                {
+
+                if(semanticCheck.typeErrors.isEmpty()){
                     IntermediateCode interCode = new IntermediateCode();
                     interCode.traverseTree(parser.AST.childs.get(0));
                 }

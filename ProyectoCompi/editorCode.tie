@@ -1,19 +1,10 @@
 run
 
-con(true)
 
-/con	
-
-
-123
-
-con(true)
-
-/con	
+num	id = 123;
 
 
-123
+tok
 
-num id = 12;
 
-/run		
+/run	
