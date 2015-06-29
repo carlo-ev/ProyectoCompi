@@ -173,7 +173,7 @@ start with PROGRAM;
 
 //----------- Statement ID or Function Disambiguation
 
-    CALL_FUNCTION ::= ID:id PARIZQ PARAMS:p PARDER END                          {: RESULT = new TreeNode("Call Function", id, p); :}
+    CALL_FUNCTION ::= ID:id PARIZQ PARAMS:p PARDER END                          {: RESULT = new TreeNode("Call Function", new TreeNode(id, p)); :}
         | ID:id ASSIGN:a E:e END                                                {: RESULT = new TreeNode("=", new TreeNode(id), e); :};
 
 //----------- Statement ID or Function End

@@ -6,6 +6,8 @@
 package proyectocompi;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JTextArea;
 
 /**
@@ -21,6 +23,7 @@ public class TieSemantics {
     public JTextArea outputPane;
     public boolean inFunction;
     public int functionTypeCount;
+    public ArrayList<SymbolTable> allTables;
     
     public TieSemantics(){}
     
@@ -37,6 +40,9 @@ public class TieSemantics {
         //inicial.addSymbol("put", "str->nil", 0, 0);
         this.declarationErrors = new ArrayList();
         this.typeErrors = new ArrayList();  
+        
+        allTables = new ArrayList();
+        allTables.add(inicial);
         
         this.inFunction = false;
         this.functionTypeCount = 0;
@@ -101,12 +107,14 @@ public class TieSemantics {
             SymbolTable conTable = new SymbolTable();
             conTable.parentTable = table;
             actual.scope = conTable;
+            this.allTables.add(conTable);
             declarationRun(actual.childs.get(1), conTable);
             
             if(!actual.childs.get(2).operation.isEmpty()){
                 SymbolTable elseTable = new SymbolTable();
                 elseTable.parentTable = table;
                 actual.childs.get(2).scope = elseTable;
+                this.allTables.add(elseTable);
                 declarationRun(actual.childs.get(2).childs.get(0), elseTable);
             } 
             System.out.println(table);
@@ -115,6 +123,7 @@ public class TieSemantics {
             SymbolTable conTable = new SymbolTable();
             conTable.parentTable = table;
             actual.scope = conTable;
+            this.allTables.add(conTable);
             declarationRun(actual.childs.get(1), conTable);
             System.out.println(table);
         }else if(actual.operation.equals("rep")){
@@ -122,6 +131,7 @@ public class TieSemantics {
             SymbolTable repTable = new SymbolTable();
             repTable.parentTable = table;
             actual.scope = repTable;
+            this.allTables.add(repTable);
             declarationRun(actual.childs.get(3), repTable);
             System.out.println(table);
         }else if(actual.operation.equals("act")){
@@ -150,7 +160,7 @@ public class TieSemantics {
                 System.out.println(functionTable);
                 functionTable.parentTable = table;
                 actual.scope = functionTable;
-                
+                this.allTables.add(functionTable);
                 boolean pastFunctionState = this.inFunction;
                 int pastFunctionCount = this.functionTypeCount;
                 this.inFunction = true;
@@ -174,6 +184,7 @@ public class TieSemantics {
                 optionTable.parentTable = table;
                 System.out.println("appending scope to case "+casesNode.childs.get(i).operation);
                 casesNode.childs.get(i).scope = optionTable;
+                this.allTables.add(optionTable);
                 declarationRun( casesNode.childs.get(i).childs.get(1), optionTable );
             }
             
@@ -182,6 +193,7 @@ public class TieSemantics {
                 SymbolTable anyTable = new SymbolTable();
                 anyTable.parentTable = table;
                 elseNode.scope = anyTable;
+                this.allTables.add(anyTable);
                 declarationRun( elseNode.childs.get(0), anyTable );
             }
             System.out.println(table);
@@ -458,14 +470,20 @@ public class TieSemantics {
         String finalType = "";
         switch(type){
             case 'o'://For arithmetic operations -> +, -, /, *
-            case 'c'://For comparison operations -> <, >, <=, >=
                 if( (leftType.equals("num") && rightType.equals("num")) || (leftType.equals("dec") || rightType.equals("dec")) ){
                     finalType = leftType;
                 }else{
                     this.typeErrors.add("Operandos tipo: "+leftType+" y "+rightType+" no se permite en la operation: "+operation.operation);
                 }
                 break;
-            case 'b'://For boolean operations -> a``nd, or
+            case 'c'://For comparison operations -> <, >, <=, >=
+                if( (leftType.equals("num") && rightType.equals("num")) || (leftType.equals("dec") || rightType.equals("dec")) ){
+                    finalType = "bin";
+                }else{
+                    this.typeErrors.add("Operandos tipo: "+leftType+" y "+rightType+" no se permite en la operation: "+operation.operation);
+                }
+                break;
+            case 'b'://For boolean operations -> and, or
                 if(leftType.equals("bin") && rightType.equals("bin")){
                     finalType = leftType;
                 }else{
@@ -478,7 +496,7 @@ public class TieSemantics {
                     || (leftType.equals("char") && rightType.equals("char"))
                     || (leftType.equals("dec") && rightType.equals("dec"))
                 ){
-                    finalType = leftType;
+                    finalType = "bin";
                 }else{
                     this.typeErrors.add("Operandos tipo: "+leftType+" y "+rightType+" no se permiten en comparacion");
                 }

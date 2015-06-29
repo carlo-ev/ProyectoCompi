@@ -1,29 +1,12 @@
 run
 
-<<<<<<< HEAD
-bin sisi;
-=======
-con(c < d or true or true and a < b)
->>>>>>> 846b0531a750b7372438da2cba72b6e17d90c6ba
+num a = 12;
 
-bin act funcion(num id, num t2, dec aja, bin esto)
-	num nuevo = 12;
-	num esto2;
-	bin tambien;
-	dec perro;
-	t2 = 12;
-	id = 12;
-	esto = false;
-	ret esto;
-/act
+con(a < 123)
+	bin bb = false;
+/con
 
-sisi = funcion(12, 123124, 1.23, true);
+a = 123;
 
-nil act print(str mjm)
- bin buenobueno = false;
-/act
-
-str string;
-print(string);
 
 /run	

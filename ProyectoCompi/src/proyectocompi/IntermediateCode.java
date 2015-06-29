@@ -96,7 +96,7 @@ public class IntermediateCode {
                     if(currentStatement.type != null)
                     {
                         tempCount++;
-                        String temp = "t" + tempCount;
+                        String temp = "$t" + tempCount;
                         interNode = new IntermediateNode("=", currentStatement.operation, "", temp);
                         interTable.add(interNode);
                         interNode = new IntermediateNode("param", temp, "", "");
@@ -202,8 +202,8 @@ public class IntermediateCode {
                 interTable.add(interNode);
                 currentStatement = statement.childs.get(0);// Gets the condition argument to compare with the options/cases.
                 tempCount++;
-                setArg = "t" + tempCount;
-                interNode = new IntermediateNode("=", currentStatement.operation, "", "t" + tempCount);
+                setArg = "$t" + tempCount;
+                interNode = new IntermediateNode("=", currentStatement.operation, "", "$t" + tempCount);
                 interTable.add(interNode);
                 
                 currentStatement = statement.childs.get(1);// Gets the options/cases.
@@ -248,7 +248,7 @@ public class IntermediateCode {
              operator2 = getTemp(currentStatement);
          
         tempCount++;
-        String temp = "t" + tempCount;
+        String temp = "$t" + tempCount;
         System.out.println("");
         interNode = new IntermediateNode(statement.operation, operator1, operator2, temp);
         interTable.add(interNode);
@@ -388,7 +388,7 @@ public class IntermediateCode {
             if(logicalStatement.operation.equals("true"))
             {
                 tempCount++;
-                interNode = new IntermediateNode("=", logicalStatement.operation, "", "t" + tempCount);
+                interNode = new IntermediateNode("=", logicalStatement.operation, "", "$t" + tempCount);
                 interTable.add(interNode);
                 
                 interNode = new IntermediateNode(jumpTag[0], "", "", "");
@@ -397,7 +397,7 @@ public class IntermediateCode {
             else if(logicalStatement.operation.equals("false"))
             {
                 tempCount++;
-                interNode = new IntermediateNode("=", logicalStatement.operation, "", "t" + tempCount);
+                interNode = new IntermediateNode("=", logicalStatement.operation, "", "$t" + tempCount);
                 interTable.add(interNode);
                 
                 interNode = new IntermediateNode(jumpTag[1].substring(1), "", "", "");
@@ -434,7 +434,7 @@ public class IntermediateCode {
         else
         {
             tempCount++;
-            String temp = "t" + tempCount;
+            String temp = "$t" + tempCount;
 
             interNode = new IntermediateNode("=", currentStatement.operation, "", temp);
             interTable.add(interNode);
@@ -500,8 +500,8 @@ public class IntermediateCode {
             interTable.add(interNode);
             TreeNode caseVal = currentStatement.childs.get(0);// Get option/case argument.
             tempCount++;
-            String tempOptArg = "t" + tempCount;
-            interNode = new IntermediateNode("=", caseVal.operation, "", "t" + tempCount);
+            String tempOptArg = "$t" + tempCount;
+            interNode = new IntermediateNode("=", caseVal.operation, "", "$t" + tempCount);
             interTable.add(interNode);
 
             interNode = new IntermediateNode("if=", setArg, tempOptArg, "goto " + tagTempTrue);

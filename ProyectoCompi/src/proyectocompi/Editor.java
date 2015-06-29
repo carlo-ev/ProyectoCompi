@@ -415,11 +415,17 @@ public class Editor extends javax.swing.JFrame {
                     interCode.traverseTree(parser.AST.childs.get(0));
                     this.tabs.setEnabledAt(2, true);
                     this.intermediateTextArea.setText("");
+                    
                     for(IntermediateNode line : interCode.interTable){
                         this.intermediateTextArea.append( 
                                 line.operator + "  " + line.operandum1 + "  " + line.operandum2 + "  " + line.result + "\n"
                         );
                     }
+                    
+                    this.finalTextArea.setText("");
+                    FinalCode fin = new FinalCode(interCode.interTable, semanticCheck.allTables);
+                    this.finalTextArea.setText( fin.generate() );
+                    this.tabs.setEnabledAt(3, true);
                 }
             }
         }catch(Exception ex){
