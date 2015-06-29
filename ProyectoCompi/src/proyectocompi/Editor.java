@@ -20,10 +20,14 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTree;
 import javax.swing.WindowConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 /**
  *
@@ -41,13 +45,12 @@ public class Editor extends javax.swing.JFrame {
     ArrayList<String> past = new ArrayList<String>();
     ArrayList<String> future = new ArrayList<String>();
     HashMap<String, String> shortcuts = new HashMap<String, String>();
+    JTree tree;
+    DefaultMutableTreeNode ast;
     
     public Editor() {
         initComponents();
         
-        //Set Window Full Size
-        this.setVisible(true);
-        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         
         //Parser Setup
         TieLexer.outputArea = this.outputPane;
@@ -170,6 +173,8 @@ public class Editor extends javax.swing.JFrame {
         outputLabel = new javax.swing.JLabel();
         statusBar = new javax.swing.JLabel();
         documentBar = new javax.swing.JLabel();
+        treeScrollPane = new javax.swing.JScrollPane();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
         topMenuBar = new javax.swing.JMenuBar();
         barFileMenu = new javax.swing.JMenu();
         barOpenButton = new javax.swing.JMenuItem();
@@ -312,23 +317,34 @@ public class Editor extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(editorScroll)
                     .addComponent(outputScroll)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(statusBar, javax.swing.GroupLayout.PREFERRED_SIZE, 505, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(documentBar, javax.swing.GroupLayout.PREFERRED_SIZE, 292, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(outputLabel))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                    .addComponent(statusBar, javax.swing.GroupLayout.PREFERRED_SIZE, 505, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(documentBar, javax.swing.GroupLayout.PREFERRED_SIZE, 292, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(outputLabel))
+                            .addGap(0, 0, Short.MAX_VALUE))
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(editorScroll, javax.swing.GroupLayout.PREFERRED_SIZE, 604, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(treeScrollPane))))
                 .addContainerGap())
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(0, 0, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(editorScroll, javax.swing.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(editorScroll, javax.swing.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE)
+                    .addComponent(treeScrollPane))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -339,6 +355,11 @@ public class Editor extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(statusBar, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(documentBar, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(0, 0, Short.MAX_VALUE)))
         );
 
         pack();
@@ -363,6 +384,7 @@ public class Editor extends javax.swing.JFrame {
             parser.parse();
             if (parser.errors == 0 && TieLexer.lexErrors.isEmpty()) {
                 printNode(parser.AST, "");
+                this.createJtree(parser.AST);
                 TieSemantics semanticCheck = new TieSemantics(parser.AST);
                 semanticCheck.typeCheck();
                 this.outputPane.append("> Successful Code Parsing! < \n");
@@ -379,6 +401,25 @@ public class Editor extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_barCheckButtonActionPerformed
 
+    private void createJtree(TreeNode parent){
+        ast = new DefaultMutableTreeNode(parent.operation);
+        createParentNode(ast, parent.childs.get(0));
+        tree = new JTree(new DefaultTreeModel(ast));
+        treeScrollPane.getViewport().add(tree);
+    }
+    
+    private void createParentNode(DefaultMutableTreeNode guiNode, TreeNode parent){
+        if (!parent.operation.isEmpty()) {
+            DefaultMutableTreeNode actual = new DefaultMutableTreeNode(parent.operation);
+            guiNode.add(actual);
+            if (parent.childs.size() > 0) {
+                for (TreeNode temp : parent.childs) {
+                    createParentNode(actual, temp);
+                }
+            }
+        }
+    }
+    
     private void printNode(TreeNode node, String space){
         System.out.println(space+"_"+node.toString());
         for(Object child : node.getChilds()){
@@ -464,10 +505,12 @@ public class Editor extends javax.swing.JFrame {
     private javax.swing.JScrollPane editorScroll;
     private javax.swing.JTextArea editorTextArea;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JLabel outputLabel;
     private javax.swing.JTextArea outputPane;
     private javax.swing.JScrollPane outputScroll;
     private javax.swing.JLabel statusBar;
     private javax.swing.JMenuBar topMenuBar;
+    private javax.swing.JScrollPane treeScrollPane;
     // End of variables declaration//GEN-END:variables
 }

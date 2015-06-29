@@ -38,11 +38,10 @@ import java_cup.runtime.Symbol;
 //Values
 digit = [0-9]+
 boolean = (true|false)
-//character = \'(.|\s)\'
 character = \'.\'
 string = \"(.|\s|\t|\n)*\"
 float = {digit}(\.[0.-9]{1,2})?
-whitespace = [\s|\t\|\r|\n]+
+whitespace = [ \n\t\r]+
 
 //Types and Assignment
 id = [a-zA-Z|_]+({digit}([a-zA-Z|_]+)?)*
@@ -98,7 +97,7 @@ lessEqualThan = <=
 greaterEqualThan = ">="
 equal = (==)
 unEqual = (\!=)
-not = [not|!]
+not = [!]
 
 //General Operators
 this = @
@@ -110,7 +109,6 @@ parIzq = \(
 parDer = \)
 braketIzq = \[
 braketDer = \]
-include = inc
 
 %state COMMENTS
 

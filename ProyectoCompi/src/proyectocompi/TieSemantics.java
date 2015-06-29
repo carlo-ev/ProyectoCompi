@@ -83,7 +83,7 @@ public class TieSemantics {
             if(!actual.childs.get(2).operation.isEmpty()){
                 SymbolTable elseTable = new SymbolTable();
                 elseTable.parentTable = table;
-                actual.scope = elseTable;
+                actual.childs.get(2).scope = elseTable;
                 declarationRun(actual.childs.get(2).childs.get(0), elseTable);
             } 
             System.out.println(table);

@@ -11,5 +11,14 @@
 
 public class LanguageTests {
     public static void main(String[] args) {
+        
+        if ( 12 > 11 && 11 == 11 || 12 < 12 &&  0 > 1) {
+            //True && True || False && False
+            //True || False && False
+            //True && False
+            //False
+            System.out.println("algo");
+        }
+        
     }
 }
