@@ -97,7 +97,7 @@ start with PROGRAM;
         | DIGIT:dt                                                              {: RESULT = new TreeNode( Integer.toString(dt), "num" ); :}
         | FLOAT:ft                                                              {: RESULT = new TreeNode( Float.toString(ft), "dec" ); :}
         | CHAR:chr                                                              {: RESULT = new TreeNode("'" + Character.toString(chr) + "'", "sym" ); :}
-        | STRING:str                                                            {: RESULT = new TreeNode('"' + str + '"', "str"); :}
+        | STRING:str                                                            {: RESULT = new TreeNode(str, "str"); :}
         | ID:id                                                                 {: RESULT = new TreeNode(id); :}
         | ID:id PARIZQ PARAMS:p PARDER                                          {: RESULT = new TreeNode(id, p); :}
         ;
@@ -255,7 +255,7 @@ start with PROGRAM;
         |                                                                       {: RESULT = new TreeNode(""); :}
         ;
     _IF ::= COND:cond PARIZQ LogicalA:la PARDER PROGRAM_BODY:body CONDEND _ELSE:_else
-                                                                                {: RESULT = new TreeNode("con", la, body, _else); :}
+                                                                                {: RESULT = new TreeNode("con", la, body, _else); :}                  
         ;
 
 //----------- _IF _ELSE END
@@ -282,19 +282,21 @@ start with PROGRAM;
         | _SWITCH:_switch                                                       {: RESULT = _switch; :}
         | DECLARE_FUNCTION:function                                             {: RESULT = function; :}
         | CALL_FUNCTION:callfunction                                            {: RESULT = callfunction; :}
+        
         ;
 
     STATEMENTS ::= STATEMENTS:statements STATEMENT:statement                    {:if(!(statement == null))
                                                                                 {((TreeNode)statements).addChild(statement); RESULT = statements;} :}
         | STATEMENT:statement                                                   {: RESULT = new TreeNode("Statements", statement); :}
-        | error                                                                 {: parser.report_error("Error in a Statement", ""); :}
+        | error STATEMENT
         ; 
 
     PROGRAM_BODY ::= STATEMENTS:statements                                      {: RESULT = statements; :}
         |                                                                       {: RESULT = new TreeNode(""); :}
+        | error
         ;
 
     PROGRAM ::= MAIN:main PROGRAM_BODY:body MAINEND                             {: RESULT = new TreeNode("Run", body); parser.AST = RESULT; :}
-        | error PROGRAM_BODY MAINEND                                            {: parser.report_error("RUN END without RUN", ""); :}
-        | MAIN error                                                            {: parser.report_error("Error Reaching RUN END", ""); :}
+        //| error MAINEND                                                         {: parser.report_error("RUN END without RUN", ""); :}
+        //| MAIN error                                                          {: parser.report_error("Error Reaching RUN END", ""); :}
         ;

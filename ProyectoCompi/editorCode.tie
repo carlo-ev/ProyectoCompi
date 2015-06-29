@@ -1,6 +1,6 @@
 run
 
-con(a < b or c < d or v >= d and f < g and a < c)
+con(c < d or true or true and a < b)
 
 /con	
 
