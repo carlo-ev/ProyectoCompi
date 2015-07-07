@@ -54,7 +54,21 @@ public class FinalCode {
         for(IntermediateNode instruction : this.intermediateCode){
            switch(instruction.operator){
                case "=":
-                    finalCode += "\tmove " + instruction.result + ", " + instruction.operandum1 + "\n";
+                   //finalCode += "\tmove " + instruction.result + ", " + instruction.operandum1 + "\n";
+                   boolean move = false;
+                   if(instruction.result.substring(0, 1).equals("$") && instruction.operandum1.substring(0, 1).equals("$"))
+                       move = true;
+                   
+                   String tempFinalCode = findSymbol(instruction);
+                    if(tempFinalCode.isEmpty())
+                    {
+                        if(move)
+                            finalCode += "\tmove " + instruction.result + ", " + instruction.operandum1 + "\n";
+                        else
+                            finalCode += "\tli " + instruction.result + ", " + instruction.operandum1 + "\n";
+                    }
+                    else
+                        finalCode += tempFinalCode;
                    break;
                case "+":
                     finalCode += "\tadd " + instruction.result + ", " + instruction.operandum1 + ", " + instruction.operandum2 + "\n"; 
@@ -70,25 +84,46 @@ public class FinalCode {
                    break;
                 case "if<":
                     finalCode += "\tblt " + instruction.operandum1 + ", " + instruction.operandum2 + ", " + instruction.result.split("\\s+")[1] + "\n";
+                    break;
                 case "if<=":
                     finalCode += "\tble " + instruction.operandum1 + ", " + instruction.operandum2 + ", " + instruction.result.split("\\s+")[1] + "\n";
+                    break;
                 case "if>":
                     finalCode += "\tbgt " + instruction.operandum1 + ", " + instruction.operandum2 + ", " + instruction.result.split("\\s+")[1] + "\n";
+                    break;
                 case "if>=":
                     finalCode += "\tbge " + instruction.operandum1 + ", " + instruction.operandum2 + ", " + instruction.result.split("\\s+")[1] + "\n";
+                    break;
                 case "if==":
                     finalCode += "\tbeq " + instruction.operandum1 + ", " + instruction.operandum2 + ", " + instruction.result.split("\\s+")[1] + "\n";
+                    break;
                 case "if!=":
                     finalCode += "\tbne " + instruction.operandum1 + ", " + instruction.operandum2 + ", " + instruction.result.split("\\s+")[1] + "\n";
+                    break;
                 default:
                     if(instruction.operator.startsWith("goto")){
-                        finalCode += "\tj " + instruction.operator.split("\\s+")[1] + "\n";
-                    }else{
+                        String tempString[] =  instruction.operator.split("\\s+");
+                        if(tempString.length > 1)
+                            finalCode += "\tj " + tempString[1] + "\n";
+                        else
+                            finalCode += "\tj " + tempString[0] + "\n";
+                            
+                    }else if(instruction.operator.equals("call")){
+                        finalCode += "\tjal " + instruction.operandum1 + "\n";
+                    }
+                    else if(instruction.operator.equals("ret"))
+                    {
+                        finalCode += "\tjr $ra\n";
+                    }
+                    else {
                         finalCode += instruction.operator + ":\n";
                     }
+                    break;
            }
-            
+                
         }
+        finalCode += "\tli $v0, 10\n";
+        finalCode += "\tsyscall\n";
         return finalCode;
     }
     
@@ -101,6 +136,19 @@ public class FinalCode {
             }
         }
         return free;
+    }
+    
+    public String findSymbol(IntermediateNode instruction)
+    {
+        String finalCode = "";
+        for(SymbolTable table : this.symbolTables){
+            System.out.println(table);
+            for(TieSymbol var : table.table){
+                if(instruction.result.equals(var.id))
+                    finalCode = "\tsw " + instruction.operandum1 + ", " + instruction.result + "\n";
+            }
+        }
+        return finalCode;
     }
     
     public void ocupy(String reg){

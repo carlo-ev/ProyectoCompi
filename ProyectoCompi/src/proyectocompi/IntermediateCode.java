@@ -86,10 +86,11 @@ public class IntermediateCode {
             
             else if(statement.operation.equals("Call Function"))
             {
-                int paramCount = statement.childs.get(0).childs.size();
+                TreeNode functionName = statement.childs.get(0);// Name of function
+                int paramCount = functionName.childs.get(0).childs.size(); //Number of parameters
                 
                 for (int j = 0; j < paramCount; j++) {
-                    currentStatement = statement.childs.get(0);// Function parameters
+                    currentStatement = functionName.childs.get(0);// Function parameters
                     currentStatement = currentStatement.childs.get(j);// Function parameter value
                     System.out.println("For operation is: " + currentStatement.operation);
                     
@@ -110,7 +111,7 @@ public class IntermediateCode {
                     }
                 }
                 currentStatement = statement.childs.get(0);// Function parameters
-                interNode = new IntermediateNode("call", statement.type, Integer.toString(currentStatement.childs.size()), "");
+                interNode = new IntermediateNode("call", functionName.operation, Integer.toString(paramCount), "");
                 interTable.add(interNode);
             }
             
@@ -174,6 +175,7 @@ public class IntermediateCode {
                 interNode = new IntermediateNode(rep + repCount, "", "", "");
                 interTable.add(interNode);
                 /*>>>>>>>>>> First Assignment Construction <<<<<<<<<<*/
+                String retArgument = argTag + argCount;
                 currentStatement = statement.childs.get(0);
                 assignmentConstruction(currentStatement);
                 /*>>>>>>>>>> Logical Expression Construction <<<<<<<<<<*/
@@ -187,7 +189,7 @@ public class IntermediateCode {
                 /*>>>>>>>>>> Second Assignment Construction <<<<<<<<<<*/
                 currentStatement = statement.childs.get(2);
                 assignmentConstruction(currentStatement);
-                interNode = new IntermediateNode("goto " + argTag + argCount, "", "", "");
+                interNode = new IntermediateNode("goto " + retArgument, "", "", "");
                 interTable.add(interNode);
                 interNode = new IntermediateNode(falseTag + logResCount, "", "", "");
                 interTable.add(interNode);
@@ -237,19 +239,52 @@ public class IntermediateCode {
         IntermediateNode interNode;
         String operator1 = statement.childs.get(0).operation;
         String operator2 = statement.childs.get(1).operation;
+        String temp = "ündefined";
+        
         
         currentStatement = statement.childs.get(0);
          if(currentStatement.operation.matches(operators.pattern()))
             operator1 = getTemp(currentStatement);
          
+        if(statement.childs.get(0).childs.size() != 0)
+        {
+            if(currentStatement.childs.get(0).operation.equals("Params"))
+            {
+                TreeNode callFunction = new TreeNode("Statement", new TreeNode("Call Function",new TreeNode(currentStatement.operation , currentStatement.childs.get(0))));
+                System.out.println("The current statement is: " + callFunction.operation);
+                traverseTree(callFunction);
+                
+                tempCount++;
+                temp = "$t" + tempCount;
+                interNode = new IntermediateNode("=", currentStatement.operation, "", temp);
+                interTable.add(interNode);
+                operator1 = temp;
+            }
+        }
+        
+        if(statement.childs.get(1).childs.size() != 0)
+        {
+            if(statement.childs.get(1).childs.get(0).operation.equals("Params"))
+            {
+                TreeNode callFunction = new TreeNode("Statement", new TreeNode("Call Function",new TreeNode(statement.childs.get(1).operation , statement.childs.get(1).childs.get(0))));
+                System.out.println("The current statement is: " + callFunction.operation);
+                traverseTree(callFunction);
+                
+                tempCount++;
+                temp = "$t" + tempCount;
+                interNode = new IntermediateNode("=", statement.childs.get(1).operation, "", temp);
+                interTable.add(interNode);
+                operator2 = temp;
+            }
+        }
+         
          currentStatement = statement.childs.get(1);
          
          if(currentStatement.operation.matches(operators.pattern()))
              operator2 = getTemp(currentStatement);
-         
+        
         tempCount++;
-        String temp = "$t" + tempCount;
-        System.out.println("");
+        temp = "$t" + tempCount; 
         interNode = new IntermediateNode(statement.operation, operator1, operator2, temp);
         interTable.add(interNode);
         return temp;
@@ -433,6 +468,19 @@ public class IntermediateCode {
 
         else
         {
+            if(currentStatement.childs.size() != 0)
+            {
+                
+                if(currentStatement.childs.get(0).operation.equals("Params"))
+                {
+                    
+                    TreeNode callFunction = new TreeNode("Statement", new TreeNode("Call Function",new TreeNode(currentStatement.operation , currentStatement.childs.get(0))));
+                    System.out.println("The current statement is: " + callFunction.operation);
+                    traverseTree(callFunction);
+                }
+                    
+            }
+            
             tempCount++;
             String temp = "$t" + tempCount;
 
